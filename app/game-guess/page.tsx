@@ -184,6 +184,10 @@ export default function GameGuess() {
     setHintsRemaining(hintsRemaining - 1);
   };
 
+  const giveUp = () => {
+    setLifes(0);
+  };
+
   return (
     <div className="gap-7 flex flex-col">
       <Header lifes={lifes} hintsRemaining={hintsRemaining} />
@@ -205,7 +209,9 @@ export default function GameGuess() {
             >
               <InfoIcon />
             </Button>
-            <Button variant="destructive">Give Up</Button>
+            <Button variant="destructive" onClick={giveUp}>
+              Give Up
+            </Button>
           </div>
         ) : lifes != 0 ? (
           <div className="border-2 border-green-700">

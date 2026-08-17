@@ -4,4 +4,15 @@ const nextConfig: NextConfig = {
   /* config options here */
 };
 
+module.exports = {
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/game-guess",
+        permanent: true,
+      },
+    ];
+  },
+};
 export default nextConfig;
