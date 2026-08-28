@@ -11,6 +11,7 @@ export async function igdbRequest(endpoint: string, query: string) {
   });
 
   if (!response.ok) {
+    console.error(`IGDB request failed: ${response.json()}`);
     throw new Error(`IGDB request failed: ${response.status}`);
   }
 

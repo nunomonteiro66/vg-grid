@@ -9,8 +9,6 @@ export async function GET(request: Request) {
     return n === 0 ? 1 : n;
   };
 
-  console.log(n_games());
-
   const games = await getRandomGames(n_games());
 
   return Response.json(games);

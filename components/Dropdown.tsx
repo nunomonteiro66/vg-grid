@@ -1,18 +1,28 @@
 import { Popover } from "@radix-ui/themes";
-import { ComponentProps, Dispatch, SetStateAction } from "react";
+import { ComponentProps, Dispatch, ReactNode, SetStateAction } from "react";
 import SearchInput from "./SearchInput";
 
+export type DropdownItemvariant = "default" | "warning" | "danger";
+
+const variantClasses: Record<DropdownItemvariant, string> = {
+  default: "",
+  warning: "bg-amber-300",
+  danger: "bg-red-500",
+};
+
 export type DropdownItem = {
-  img: string;
+  icon?: string;
   name: string;
   id: number;
+  disabled?: boolean;
+  variant?: DropdownItemvariant;
 };
 
 type ButtonProps = ComponentProps<"button">;
 
-type DropdownProps = {
+type DropdownProps = ComponentProps<"div"> & {
   items: DropdownItem[];
-  onSelect: (item: DropdownItem) => void;
+  onOptionSelect: (item: DropdownItem) => void;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 };
@@ -27,14 +37,16 @@ function Button({ children, ...props }: ButtonProps) {
 
 export default function Dropdown({
   items,
-  onSelect,
+  onOptionSelect,
   open,
   setOpen,
+  children,
+  ...props
 }: DropdownProps) {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger>
-        <div></div>
+        <div>{children}</div>
       </Popover.Trigger>
 
       <Popover.Content
@@ -43,13 +55,25 @@ export default function Dropdown({
         }}
         side="bottom"
         sideOffset={0}
-        avoidCollisions={false}
       >
-        <div className="max-h-[calc(var(--radix-popover-content-available-height)-50px)] overflow-y-auto gap-2 flex flex-col">
+        <div
+          className="max-h-[calc(var(--radix-popover-content-available-height)-50px)] overflow-y-auto gap-2 flex flex-col"
+          {...props}
+        >
           {items.map((item) => (
-            <Button onClick={() => onSelect(item)} key={item.id}>
-              <img src={item.img} width={30}></img>
-              <p>{item.name}</p>
+            <Button
+              onClick={() => onOptionSelect(item)}
+              key={item.id}
+              disabled={item.disabled}
+            >
+              <div
+                className={`flex items-center gap-8 w-full ${
+                  item.variant ? variantClasses[item.variant] : ""
+                }`}
+              >
+                <img src={item.icon} width={30}></img>
+                <p>{item.name}</p>
+              </div>
             </Button>
           ))}
         </div>

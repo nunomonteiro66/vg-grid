@@ -2,23 +2,17 @@
 
 import SearchInput from "@/components/SearchInput";
 import { Card, Popover, Separator, TextField } from "@radix-ui/themes";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useEffect, useRef, useState } from "react";
 import type { Game as GameType } from "@/lib/igdb/helpers/types";
 import Dropdown from "@/components/Dropdown";
 import ImgCarousel, { CarouselImg } from "@/components/ImgCarousel";
 import { BookmarkIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { InfoIcon } from "lucide-react";
-
-type Game = {
-  img: string;
-  name: string;
-  id: number;
-};
-
-type SearchProps = ComponentProps<"div"> & {
-  onGameSelect: (game: { id: number; name: string }) => void;
-};
+import DialogSearch from "@/components/DialogSearch";
+import BlanksText from "@/components/BlanksText";
+import { DropdownItem as Game } from "@/components/Dropdown";
+import GameSearchSelect from "@/components/GameSearchSelect";
 
 function Header({
   lifes,
@@ -48,57 +42,19 @@ function Header({
   );
 }
 
-function Search({ onGameSelect, ...props }: SearchProps) {
-  const [currentGamesSearched, setCurrentGamesSearched] = useState<Game[]>([]);
-  const [search, setSearch] = useState("");
-  const [open, setOpen] = useState(false);
-
-  const searchGames = async (search: string) => {
-    const response = await fetch(
-      `/api/games/search?q=${encodeURIComponent(search)}`,
-    );
-
-    const results = (await response.json()) as GameType[];
-
-    setCurrentGamesSearched(
-      results.map((res) => ({
-        id: res.id,
-        img: res.cover?.url,
-        name: res.name,
-      })),
-    );
-  };
-
-  //!!!! TO-FIX:
-  // - timeout between searches
-
-  const onValueChange = (search: string) => {
-    setSearch(search);
-    setOpen(search.length > 2 ? true : false);
-    searchGames(search);
-  };
-
-  const onOptionSelect = (game: Game) => {
-    setSearch("");
-    onGameSelect({ id: game.id, name: game.name });
-  };
-
+function ResultMessage({ won = false }: { won: boolean }) {
   return (
-    <div {...props}>
-      <SearchInput
-        placeholder="Search for a game..."
-        onValueChange={(search: string) => onValueChange(search)}
-        currentSearch={search}
-        /* onFocus={() => {
-          setOpen(true);
-        }} */
-      />
-      <Dropdown
-        items={currentGamesSearched}
-        onSelect={(item) => onOptionSelect(item)}
-        open={open}
-        setOpen={setOpen}
-      ></Dropdown>
+    <div className={`border-2 ${won ? "text-green-700" : "text-red-700"}`}>
+      {won ? (
+        <div>
+          CORRECT!!! <br />
+          Nicely done
+        </div>
+      ) : (
+        <div>
+          FAILED!!! <br /> BETTER LUCK NEXT TIME{" "}
+        </div>
+      )}
     </div>
   );
 }
@@ -108,7 +64,7 @@ export default function GameGuess() {
   const [hintsRemaining, setHintsRemaining] = useState(6);
   const [hints, setHints] = useState<{ type: string; value: string }[]>([]);
   const [game, setGame] = useState<GameType>();
-  const [guesses, setGuesses] = useState<string[]>([]);
+  const [guesses, setGuesses] = useState<Pick<GameType, "id" | "name">[]>([]);
   const [won, setWon] = useState(false);
 
   useEffect(() => {
@@ -127,7 +83,7 @@ export default function GameGuess() {
     if (game?.id === guessedGame.id) {
       setWon(true);
     } else {
-      setGuesses([...guesses, guessedGame.name]);
+      setGuesses([...guesses, guessedGame]);
       setLifes(lifes - 1);
     }
   };
@@ -194,12 +150,28 @@ export default function GameGuess() {
 
       <div className="flex flex-col gap-3 max-w-125">
         {game && (
-          <ImgCarousel imgs={game?.screenshots as CarouselImg[]}></ImgCarousel>
+          <>
+            <ImgCarousel imgs={game?.screenshots as CarouselImg[]} />
+            <div className="flex whitespace-pre flex-wrap">
+              {lifes != 0 && !won ? (
+                <BlanksText text={game.name} />
+              ) : (
+                <>
+                  <p>{game.name}</p>
+                </>
+              )}
+            </div>
+          </>
         )}
 
         {!won && lifes !== 0 ? (
           <div className="flex gap-2 w-full">
-            <Search className="w-full" onGameSelect={onGameSelect} />
+            <GameSearchSelect
+              className="w-full"
+              onGameSelect={onGameSelect}
+              excludeList={guesses.map((g) => g.id)}
+              similarList={[]}
+            />
             <Button
               variant="outline"
               size="icon"
@@ -213,24 +185,8 @@ export default function GameGuess() {
               Give Up
             </Button>
           </div>
-        ) : lifes != 0 ? (
-          <div className="border-2 border-green-700">
-            <div className="">CORRECT!!!</div>
-            <div>
-              {" "}
-              THE ANSWER WAS:{" "}
-              <span className="text-green-700">{game?.name}</span>{" "}
-            </div>
-          </div>
         ) : (
-          <div className="border-2 text-red-700">
-            <div className="">FAILED!!!</div>
-            <div>
-              {" "}
-              THE ANSWER WAS:{" "}
-              <span className="text-red-700">{game?.name}</span>{" "}
-            </div>
-          </div>
+          <ResultMessage won={won && lifes != 0} />
         )}
 
         <div className="flex">
@@ -239,7 +195,7 @@ export default function GameGuess() {
               <p className="text-xl text-red-700 text-center">Guesses</p>
               {guesses.map((guess, i) => (
                 <p key={`guess-${i}`} className="text-[14px] text-red-700">
-                  {guess}
+                  {guess.name}
                 </p>
               ))}
             </div>

@@ -26,7 +26,8 @@ export default function SearchInput({
     <TextField.Root
       placeholder={placeholder}
       onChange={(event) => {
-        onValueChange(event.target.value);
+        const value = event.target.value;
+        onValueChange(value);
       }}
       value={currentSearch}
       {...props}

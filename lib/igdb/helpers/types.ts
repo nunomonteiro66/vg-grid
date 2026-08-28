@@ -28,4 +28,5 @@ export type Game = {
   release_date: string;
   developers: DefaultObj[];
   publishers: DefaultObj[];
+  coverUrl?: string;
 };
