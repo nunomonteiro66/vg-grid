@@ -1,12 +1,13 @@
 import { igdbRequest } from "./client";
 
-export async function getScreenshots(gameId: number) {
+export async function getScreenshots(gameIds: number[]) {
+  const where = gameIds.map((id) => `game = ${id}`);
+
   return igdbRequest(
-    "games",
+    "screenshots",
     `
       fields id, url, width, height;
-      limit 100;
-      where game=${gameId}
-    `
-  )
+      where ${where.join("|")};
+    `,
+  );
 }

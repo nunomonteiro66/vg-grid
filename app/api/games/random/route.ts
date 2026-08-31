@@ -1,4 +1,4 @@
-import { getRandomGames } from "@/lib/igdb/games";
+import { getRandomGames } from "@/lib/games_pg/games";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

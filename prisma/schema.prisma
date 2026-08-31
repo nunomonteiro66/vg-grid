@@ -4,8 +4,9 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider        = "prisma-client"
+  output          = "../lib/generated/prisma"
+  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 datasource db {
@@ -13,12 +14,23 @@ datasource db {
 }
 
 model Games {
-  id        Int      @id @default(autoincrement())
-  igdbId    Int      @unique
-  name      String
-  coverUrl String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  igdbId      Int      @unique
+  name        String
+  coverUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  description String?
 
-  search_vector Unsupported("tsvector")?
+  franchiseId Int?
+  franchise   Franchises? @relation(fields: [franchiseId], references: [id])
+}
+
+
+model Franchises {
+  id     Int    @id @default(autoincrement())
+  igdbId Int    @unique
+  name   String
+
+  games Games[]
 }

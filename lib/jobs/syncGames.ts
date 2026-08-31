@@ -3,7 +3,6 @@
 import { igdbRequest } from "../igdb/client";
 import { fullGameConditions } from "../igdb/helpers/fullgame-conditions";
 import prisma from "@/lib/prisma";
-import normalizeString from "./helpers/normalizeString";
 
 export async function syncGames() {
   let offset = 0;
@@ -13,7 +12,7 @@ export async function syncGames() {
     const response = await igdbRequest(
       "games",
       `
-      fields name, cover.url;
+      fields name, cover.url, summary, franchises;
       limit 500;
       offset ${offset};
       sort id asc;
@@ -22,6 +21,19 @@ export async function syncGames() {
     );
 
     if (response.length === 0) return `Offset: ${offset}; Fetched: ${total}`;
+
+    const fetchFranchiseId = async (igdbId: number) => {
+      return (
+        await prisma.franchises.findFirst({
+          select: {
+            id: true,
+          },
+          where: {
+            igdbId: igdbId,
+          },
+        })
+      )?.id;
+    };
 
     for (const game of response) {
       total++;
@@ -32,11 +44,15 @@ export async function syncGames() {
         update: {
           name: game.name,
           coverUrl: game.cover?.url,
+          description: game.summary,
+          franchiseId: await fetchFranchiseId(game?.franchises?.[0]),
         },
         create: {
           igdbId: game.id,
           name: game.name,
           coverUrl: game.cover?.url,
+          description: game.summary,
+          franchiseId: await fetchFranchiseId(game?.franchises?.[0]),
         },
       });
     }

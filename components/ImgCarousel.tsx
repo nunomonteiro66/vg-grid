@@ -16,7 +16,7 @@ export type CarouselImg = {
 };
 
 type ImgCarouselProps = ComponentProps<typeof Carousel> & {
-  imgs: CarouselImg[];
+  imgs?: CarouselImg[];
   expandable?: boolean;
   selectedIndex?: number;
   onImageChange?: (index: number) => void;
@@ -29,7 +29,11 @@ type ExpandableImageProps = {
 };
 
 function Image({ src, alt, expandable = false }: ExpandableImageProps) {
-  const image = <img src={src} alt={alt} width="500" height="1080" />;
+  const image = (
+    <div className="relative w-full aspect-video overflow-hidden rounded-md">
+      <img src={src} alt={alt} width="500" height="1080" />
+    </div>
+  );
 
   if (!expandable) return image;
 
@@ -79,7 +83,7 @@ export default function ImgCarousel({
   return (
     <Carousel setApi={setApi} {...props}>
       <CarouselContent>
-        {imgs.map((img, i) => (
+        {imgs?.map((img, i) => (
           <CarouselItem key={`carousel-item-${i}`}>
             <Image
               src={img.url}

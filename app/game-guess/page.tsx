@@ -79,6 +79,8 @@ export default function GameGuess() {
   }, []);
 
   const onGameSelect = (guessedGame: { id: number; name: string }) => {
+    console.log(game);
+    console.log(guessedGame);
     //check if guess is correct
     if (game?.id === guessedGame.id) {
       setWon(true);
@@ -147,22 +149,21 @@ export default function GameGuess() {
   return (
     <div className="gap-7 flex flex-col">
       <Header lifes={lifes} hintsRemaining={hintsRemaining} />
-
       <div className="flex flex-col gap-3 max-w-125">
-        {game && (
-          <>
-            <ImgCarousel imgs={game?.screenshots as CarouselImg[]} />
-            <div className="flex whitespace-pre flex-wrap">
-              {lifes != 0 && !won ? (
-                <BlanksText text={game.name} />
-              ) : (
-                <>
-                  <p>{game.name}</p>
-                </>
-              )}
-            </div>
-          </>
+        {game ? (
+          <ImgCarousel imgs={game?.screenshots as CarouselImg[]} />
+        ) : (
+          <div className="w-125 h-70"></div>
         )}
+        <div className="flex whitespace-pre flex-wrap">
+          {lifes != 0 && !won ? (
+            <BlanksText text={game?.name ?? ""} />
+          ) : (
+            <>
+              <p>{game?.name}</p>
+            </>
+          )}
+        </div>
 
         {!won && lifes !== 0 ? (
           <div className="flex gap-2 w-full">
