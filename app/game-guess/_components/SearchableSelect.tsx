@@ -1,6 +1,6 @@
 import { ComponentProps, useRef, useState } from "react";
-import Dropdown, { DropdownItem } from "../Dropdown";
-import SearchInput from "../SearchInput";
+import Dropdown, { DropdownItem } from "./Dropdown";
+import SearchInput from "./SearchInput";
 
 type SearchableSelectProps = ComponentProps<"div"> & {
   items: DropdownItem[];

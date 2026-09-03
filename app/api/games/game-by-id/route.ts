@@ -1,4 +1,4 @@
-import { getGameById } from "@/lib/games_pg/games";
+import { getGameById } from "@/lib/db/games";
 
 export async function GET(request: Request) {
   const game = await getGameById(12);

@@ -1,11 +1,12 @@
 import { ComponentProps, useMemo, useRef, useState } from "react";
-import SearchableSelect from "./ui/SearchableSelect";
-import { GameSearchResult, searchGames } from "@/app/lib/services/games";
+import SearchableSelect from "./SearchableSelect";
+import { GameSearchResult, searchGames } from "@/app/lib/api/games";
 import { DropdownItem, DropdownItemvariant } from "./Dropdown";
 
 type onGameSelectType = {
   id: number;
   name: string;
+  franchiseId?: number;
 };
 
 type GameSearchSelectProps = ComponentProps<"div"> & {
@@ -58,7 +59,11 @@ export default function GameSearchSelect({
 
   const onOptionSelect = (game: DropdownItem) => {
     //setCurrentGames([]);
-    onGameSelect({ id: game.id, name: game.name });
+    onGameSelect({
+      id: game.id,
+      name: game.name,
+      franchiseId: results.find((g) => g.id === game.id).franchise?.name,
+    });
   };
 
   return (

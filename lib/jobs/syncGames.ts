@@ -23,8 +23,9 @@ export async function syncGames() {
     if (response.length === 0) return `Offset: ${offset}; Fetched: ${total}`;
 
     const fetchFranchiseId = async (igdbId: number) => {
+      if (!igdbId) return null;
       return (
-        await prisma.franchises.findFirst({
+        await prisma.franchises.findUnique({
           select: {
             id: true,
           },

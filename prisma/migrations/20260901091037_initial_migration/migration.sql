@@ -24,5 +24,8 @@ CREATE TABLE "Franchises" (
 -- CreateIndex
 CREATE UNIQUE INDEX "Games_igdbId_key" ON "Games"("igdbId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Franchises_igdbId_key" ON "Franchises"("igdbId");
+
 -- AddForeignKey
 ALTER TABLE "Games" ADD CONSTRAINT "Games_franchiseId_fkey" FOREIGN KEY ("franchiseId") REFERENCES "Franchises"("id") ON DELETE SET NULL ON UPDATE CASCADE;

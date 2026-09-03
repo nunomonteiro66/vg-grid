@@ -2,13 +2,10 @@ import { Game } from "@/lib/igdb/helpers/types";
 import { ComponentProps, useEffect, useRef, useState } from "react";
 import ImgCarousel from "@/components/ImgCarousel";
 import BlanksText from "@/components/BlanksText";
-import DialogSearch from "./DialogSearch";
 import { CustomDialog } from "@/components/CustomDialog";
-import SearchableSelect from "./ui/SearchableSelect";
-import GameSearchSelect from "./GameSearchSelect";
+import GameSearchSelect from "@/app/game-guess/_components/GameSearchSelect";
 import { IconButton } from "@radix-ui/themes";
 import { Expand } from "lucide-react";
-import Lives from "./Lives";
 
 type GameSquareProps = ComponentProps<"div"> & {
   game?: Game;

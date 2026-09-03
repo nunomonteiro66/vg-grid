@@ -77,6 +77,13 @@ export async function getRandomGames(n: number) {
         in: randomNmbs,
       },
     },
+    include: {
+      franchise: {
+        select: {
+          name: true,
+        },
+      },
+    },
   });
 
   const screenshots = await getScreenshots(gamesFromDb.map((g) => g.igdbId));

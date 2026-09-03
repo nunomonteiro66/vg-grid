@@ -2,6 +2,10 @@ export type GameSearchResult = {
   id: number;
   name: string;
   coverUrl: string | null;
+  franchise: {
+    name: string;
+    id: number;
+  };
 };
 
 export async function searchGames(search: string): Promise<GameSearchResult[]> {

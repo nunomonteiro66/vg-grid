@@ -1,4 +1,4 @@
-import { search } from "@/lib/games_pg/games";
+import { search } from "@/lib/db/games";
 import { searchGames } from "@/lib/igdb/games";
 
 export async function GET(request: Request) {

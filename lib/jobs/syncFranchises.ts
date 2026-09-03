@@ -14,7 +14,6 @@ export async function syncFranchises() {
       limit 500;
       offset ${offset};
       sort id asc;
-      where ${fullGameConditions()};
     `,
     );
 

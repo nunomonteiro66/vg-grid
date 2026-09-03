@@ -1,18 +1,18 @@
 "use client";
 
-import SearchInput from "@/components/SearchInput";
+import SearchInput from "./_components/SearchInput";
 import { Card, Popover, Separator, TextField } from "@radix-ui/themes";
 import { ComponentProps, useEffect, useRef, useState } from "react";
 import type { Game as GameType } from "@/lib/igdb/helpers/types";
-import Dropdown from "@/components/Dropdown";
+import Dropdown from "./_components/Dropdown";
 import ImgCarousel, { CarouselImg } from "@/components/ImgCarousel";
 import { BookmarkIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { InfoIcon } from "lucide-react";
-import DialogSearch from "@/components/DialogSearch";
+import DialogSearch from "./_components/DialogSearch";
 import BlanksText from "@/components/BlanksText";
-import { DropdownItem as Game } from "@/components/Dropdown";
-import GameSearchSelect from "@/components/GameSearchSelect";
+import { DropdownItem as Game } from "./_components/Dropdown";
+import GameSearchSelect from "./_components/GameSearchSelect";
 
 function Header({
   lifes,
@@ -65,6 +65,10 @@ export default function GameGuess() {
   const [hints, setHints] = useState<{ type: string; value: string }[]>([]);
   const [game, setGame] = useState<GameType>();
   const [guesses, setGuesses] = useState<Pick<GameType, "id" | "name">[]>([]);
+
+  const [wrong, setWrong] = useState<Pick<GameType, "id" | "name">[]>([]); //games that are completly wrong
+  const [close, setClose] = useState<Pick<GameType, "id" | "name">[]>([]); //games that are similar ot the answer (same franchise)
+
   const [won, setWon] = useState(false);
 
   useEffect(() => {
@@ -85,6 +89,9 @@ export default function GameGuess() {
     if (game?.id === guessedGame.id) {
       setWon(true);
     } else {
+      if (game?.franchise && guessedGame.franchise) {
+      }
+
       setGuesses([...guesses, guessedGame]);
       setLifes(lifes - 1);
     }
@@ -149,6 +156,7 @@ export default function GameGuess() {
   return (
     <div className="gap-7 flex flex-col">
       <Header lifes={lifes} hintsRemaining={hintsRemaining} />
+      {game?.name} {game?.id} {game?.franchise?.name}
       <div className="flex flex-col gap-3 max-w-125">
         {game ? (
           <ImgCarousel imgs={game?.screenshots as CarouselImg[]} />

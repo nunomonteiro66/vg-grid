@@ -1,4 +1,4 @@
-import { getRandomGames } from "@/lib/games_pg/games";
+import { getRandomGames } from "@/lib/db/games";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

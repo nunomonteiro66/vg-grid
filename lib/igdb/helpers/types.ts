@@ -29,4 +29,7 @@ export type Game = {
   developers: DefaultObj[];
   publishers: DefaultObj[];
   coverUrl?: string;
+  franchise?: {
+    name: string;
+  };
 };

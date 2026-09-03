@@ -1,7 +1,7 @@
 "use client";
 
-import GameSquare from "@/components/GameSquare";
-import Lives from "@/components/Lives";
+import GameSquare from "./_components/GameSquare";
+import Lives from "./_components/Lives";
 import { Game } from "@/lib/igdb/helpers/types";
 import { Card } from "@radix-ui/themes";
 import { ComponentProps, useEffect, useState } from "react";
