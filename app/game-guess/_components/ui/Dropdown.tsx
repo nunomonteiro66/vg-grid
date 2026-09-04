@@ -1,21 +1,12 @@
 import { Popover } from "@radix-ui/themes";
 import { ComponentProps, Dispatch, ReactNode, SetStateAction } from "react";
 import SearchInput from "./SearchInput";
-
-export type DropdownItemvariant = "default" | "warning" | "danger";
+import { DropdownItem, DropdownItemvariant } from "./types";
 
 const variantClasses: Record<DropdownItemvariant, string> = {
   default: "",
   warning: "bg-amber-300",
   danger: "bg-red-500",
-};
-
-export type DropdownItem = {
-  icon?: string;
-  name: string;
-  id: number;
-  disabled?: boolean;
-  variant?: DropdownItemvariant;
 };
 
 type ButtonProps = ComponentProps<"button">;
@@ -24,7 +15,7 @@ type DropdownProps = ComponentProps<"div"> & {
   items: DropdownItem[];
   onOptionSelect: (item: DropdownItem) => void;
   open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
+  setOpen: (open: boolean) => void;
 };
 
 function Button({ children, ...props }: ButtonProps) {
@@ -35,12 +26,27 @@ function Button({ children, ...props }: ButtonProps) {
   );
 }
 
+function DropdownItemComponent({ item }: { item: DropdownItem }) {
+  return (
+    <div
+      className={`flex items-center gap-8 w-full ${
+        item.variant ? variantClasses[item.variant] : ""
+      }`}
+    >
+      <>
+        <img src={item.icon} width={30}></img>
+        <p>{item.name}</p>
+      </>
+    </div>
+  );
+}
+
 export default function Dropdown({
   items,
   onOptionSelect,
+  children,
   open,
   setOpen,
-  children,
   ...props
 }: DropdownProps) {
   return (
@@ -66,16 +72,13 @@ export default function Dropdown({
               key={item.id}
               disabled={item.disabled}
             >
-              <div
-                className={`flex items-center gap-8 w-full ${
-                  item.variant ? variantClasses[item.variant] : ""
-                }`}
-              >
-                <img src={item.icon} width={30}></img>
-                <p>{item.name}</p>
-              </div>
+              <DropdownItemComponent item={item} />
             </Button>
           ))}
+
+          {items.length === 0 && (
+            <DropdownItemComponent item={{ name: "No results", id: 0 }} />
+          )}
         </div>
       </Popover.Content>
     </Popover.Root>

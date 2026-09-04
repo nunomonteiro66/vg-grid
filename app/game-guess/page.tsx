@@ -1,17 +1,15 @@
 "use client";
 
-import SearchInput from "./_components/SearchInput";
+import SearchInput from "./_components/ui/SearchInput";
 import { Card, Popover, Separator, TextField } from "@radix-ui/themes";
 import { ComponentProps, useEffect, useRef, useState } from "react";
 import type { Game as GameType } from "@/lib/igdb/helpers/types";
-import Dropdown from "./_components/Dropdown";
 import ImgCarousel, { CarouselImg } from "@/components/ImgCarousel";
 import { BookmarkIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { InfoIcon } from "lucide-react";
 import DialogSearch from "./_components/DialogSearch";
 import BlanksText from "@/components/BlanksText";
-import { DropdownItem as Game } from "./_components/Dropdown";
 import GameSearchSelect from "./_components/GameSearchSelect";
 
 function Header({

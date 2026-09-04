@@ -6,7 +6,7 @@ type SearchType = {
   id: number;
   igdbId: number;
   name: string;
-  coverUrl: string;
+  coverUrl?: string;
 };
 
 export async function search(
@@ -44,7 +44,7 @@ export async function search(
     id: game.id,
     igdbId: game.igdbId,
     name: game.name,
-    coverUrl: game.coverUrl ?? "",
+    coverUrl: game.coverUrl ?? undefined,
     franchise: game.franchise?.name ?? null,
   }));
 }

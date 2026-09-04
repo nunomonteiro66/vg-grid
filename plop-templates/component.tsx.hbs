@@ -1,0 +1,11 @@
+import { ComponentProps } from "react";
+
+type {{pascalCase name}}Props = ComponentProps<"div">;
+
+export default function {{pascalCase name}}({ children, ...props }: {{pascalCase name}}Props) {
+  return (
+    <div {...props}>
+      {children}
+    </div>
+  );
+}

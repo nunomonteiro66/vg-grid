@@ -1,7 +1,7 @@
 import { ComponentProps, useMemo, useRef, useState } from "react";
 import SearchableSelect from "./SearchableSelect";
 import { GameSearchResult, searchGames } from "@/app/lib/api/games";
-import { DropdownItem, DropdownItemvariant } from "./Dropdown";
+import { DropdownItem, DropdownItemvariant } from "./ui/types";
 
 type onGameSelectType = {
   id: number;
@@ -46,7 +46,10 @@ export default function GameSearchSelect({
   }, [results, excludeList, similarList]);
 
   const handleSearch = (search: string) => {
-    if (search.trim().length === 0) return;
+    if (search.trim().length === 0) {
+      setResults([]);
+      return;
+    }
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -62,7 +65,6 @@ export default function GameSearchSelect({
     onGameSelect({
       id: game.id,
       name: game.name,
-      franchiseId: results.find((g) => g.id === game.id).franchise?.name,
     });
   };
 

@@ -3,6 +3,13 @@ type DefaultObj = {
   name: string;
 };
 
+export type Screenshot = {
+  id: number;
+  url: string;
+  width: number;
+  height: number;
+};
+
 export type Game = {
   id: number;
   name: string;

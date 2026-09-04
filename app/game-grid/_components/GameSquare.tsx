@@ -1,5 +1,5 @@
 import { Game } from "@/lib/igdb/helpers/types";
-import { ComponentProps, useEffect, useRef, useState } from "react";
+import React, { ComponentProps, useRef, useState } from "react";
 import ImgCarousel from "@/components/ImgCarousel";
 import BlanksText from "@/components/BlanksText";
 import { CustomDialog } from "@/components/CustomDialog";
@@ -10,9 +10,15 @@ import { Expand } from "lucide-react";
 type GameSquareProps = ComponentProps<"div"> & {
   game?: Game;
   gameOver: boolean;
+  setGameWon: () => void;
+  reduceLife: () => void;
 };
 
-function Dialog({ children }) {
+type DialogProps = {
+  children: React.ReactNode;
+};
+
+function Dialog({ children }: DialogProps) {
   return (
     <CustomDialog.Root>
       <CustomDialog.Trigger>
@@ -36,16 +42,13 @@ export default function GameSquare({
 }: GameSquareProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [wrongGuesses, setWrongGuesses] = useState<number[]>([]);
-  const [hideAnswer, setHideAnswer] = useState(!gameOver);
+  const [revealed, setRevealed] = useState(false);
   const [won, setWon] = useState(true);
-
-  useEffect(() => {
-    if (gameOver) setHideAnswer(false);
-  }, [gameOver]);
+  const hideAnswer = !revealed && !gameOver;
 
   const checkGameSelect = (gameId: number) => {
     if (game?.id === gameId) {
-      setHideAnswer(false);
+      setRevealed(true);
       setGameWon();
     } else {
       setWrongGuesses([...wrongGuesses, gameId]);

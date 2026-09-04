@@ -7,9 +7,10 @@ import {
   Dialog,
   IconButton,
 } from "@radix-ui/themes";
-import SearchInput from "./SearchInput";
+import SearchInput from "./ui/SearchInput";
 import { ComponentProps, ReactNode, useState } from "react";
-import Dropdown, { DropdownItem } from "./Dropdown";
+import Dropdown from "./ui/Dropdown";
+import { DropdownItem } from "./ui/types";
 import { Game } from "@/lib/igdb/helpers/types";
 
 type DialogSearchProps = ComponentProps<"div"> & {
@@ -71,7 +72,7 @@ export default function DialogSearch({
                 variant="ghost"
               >
                 <div className="flex gap-4 items-center justify-start w-full">
-                  <img src={item.img} width={30}></img>
+                  <img src={item.icon} width={30}></img>
                   <p className="text-white">{item.name}</p>
                 </div>
               </Button>
