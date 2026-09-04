@@ -28,6 +28,8 @@ model Games {
   franchise   Franchises? @relation(fields: [franchiseId], references: [id])
 
   genres GamesOnGenres[]
+  
+  platforms GamesOnPlatforms[]
 }
 
 
@@ -55,4 +57,22 @@ model GamesOnGenres {
   genre Genres  @relation(fields: [genreId], references: [id])
 
   @@id([gameId, genreId])
+}
+
+model Platforms {
+  id  Int @id @default(autoincrement())
+  igdbId  Int @unique
+  name  String
+
+  games GamesOnPlatforms[]
+}
+
+model GamesOnPlatforms {
+  gameId  Int
+  game  Games @relation(fields: [gameId], references: [id])
+
+  platformId  Int
+  platform  Platforms @relation(fields: [platformId], references: [id])
+
+  @@id([gameId, platformId])
 }

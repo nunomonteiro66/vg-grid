@@ -16,6 +16,7 @@ type Response = {
   genres: number[];
   first_release_date: number;
   total_rating: number;
+  platforms: number[];
 };
 
 export async function syncGames() {
@@ -26,7 +27,7 @@ export async function syncGames() {
     const response: Response[] = await igdbRequest(
       "games",
       `
-      fields name, cover.url, summary, franchises, genres, total_rating, first_release_date;
+      fields name, cover.url, summary, franchises, genres, total_rating, first_release_date, platforms;
       limit 500;
       offset ${offset};
       sort id asc;
@@ -62,10 +63,23 @@ export async function syncGames() {
       });
     };
 
+    const fetchPlatforms = async (igdbIds: number[]) => {
+      if (!igdbIds || igdbIds.length === 0) return null;
+
+      return await prisma.platforms.findMany({
+        where: {
+          igdbId: {
+            in: igdbIds,
+          },
+        },
+      });
+    };
+
     for (const game of response) {
       total++;
       const franchiseId = await fetchFranchiseId(game?.franchises?.[0]);
       const genreRows = (await fetchGenres(game.genres)) ?? [];
+      const platformsRows = (await fetchPlatforms(game.platforms)) ?? [];
 
       await prisma.games.upsert({
         where: {
@@ -84,6 +98,10 @@ export async function syncGames() {
             deleteMany: {},
             create: genreRows.map((g) => ({ genreId: g.id })),
           },
+          platforms: {
+            deleteMany: {},
+            create: platformsRows.map((g) => ({ platformId: g.id })),
+          },
         },
         create: {
           igdbId: game.id,
@@ -97,6 +115,9 @@ export async function syncGames() {
           totalRating: Math.round(game.total_rating),
           genres: {
             create: genreRows.map((g) => ({ genreId: g.id })),
+          },
+          platforms: {
+            create: platformsRows.map((g) => ({ platformId: g.id })),
           },
         },
       });
