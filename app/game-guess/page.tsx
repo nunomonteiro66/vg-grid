@@ -20,18 +20,18 @@ import Hints from "./_components/Hints";
 import { RandomGame } from "@/lib/db/games";
 import { GameSearchResult } from "../lib/api/games";
 
-export default function GameGuess() {
-  const [lifes, setLifes] = useState(5);
-  const [hintsRemaining, setHintsRemaining] = useState(6);
-  const [game, setGame] = useState<RandomGame>();
-  const [guesses, setGuesses] = useState<Pick<GameType, "id" | "name">[]>([]);
+export type Guess = {
+  id: number;
+  name: string;
+  close?: boolean;
+};
 
-  const [wrong, setWrong] = useState<Pick<GameType, "id" | "name">[]>([]); //games that are completely wrong
-  const [close, setClose] = useState<Pick<GameType, "id" | "name">[]>([]); //games that are similar ot the answer (same franchise)
+export default function GameGuess() {
+  const [lives, setLives] = useState(5);
+  const [game, setGame] = useState<RandomGame>();
+  const [guesses, setGuesses] = useState<Guess[]>([]);
 
   const [won, setWon] = useState(false);
-
-  const hints = ["RELEASE DATE", "GENRE", "DEVELOPER", "PLATFORMS"];
 
   useEffect(() => {
     const getRandomGame = async () => {
@@ -49,19 +49,23 @@ export default function GameGuess() {
     if (game?.id === guessedGame.id) {
       setWon(true);
     } else {
-      if (game?.franchiseId === guessedGame.franchise.id) {
-        setClose([...close, game]);
-      } else {
-        setWrong([...wrong, game!]);
-      }
-
-      setGuesses([...guesses, guessedGame]);
-      setLifes(lifes - 1);
+      setGuesses((prev) => {
+        const isClose = game?.franchiseId === guessedGame.franchise?.id;
+        return [
+          ...prev,
+          {
+            id: guessedGame.id,
+            name: guessedGame.name,
+            close: isClose,
+          },
+        ];
+      });
+      setLives(lives - 1);
     }
   };
 
   const giveUp = () => {
-    setLifes(0);
+    setLives(0);
   };
 
   const isLocal = process.env.NODE_ENV !== "production";
@@ -71,7 +75,7 @@ export default function GameGuess() {
       <div className="flex flex-col bg-[#262323] p-4 gap-3 w-2/3">
         {isLocal && (
           <p className="bg-yellow-900 text-yellow-200 p-1 text-xs">
-            DEV: answer is {game?.name ?? "loading..."}
+            DEV: answer is {game?.name ?? "loading..."} - {game?.id}
           </p>
         )}
 
@@ -82,7 +86,7 @@ export default function GameGuess() {
         )}
 
         <div className="flex whitespace-pre flex-wrap">
-          {lifes != 0 && !won ? (
+          {lives != 0 && !won ? (
             <BlanksText text={game?.name ?? ""} />
           ) : (
             <>
@@ -91,29 +95,28 @@ export default function GameGuess() {
           )}
         </div>
 
-        {!won && lifes !== 0 ? (
+        {!won && lives !== 0 ? (
           <div className="flex gap-2 w-full">
             <GameSearchSelect
               className="w-full"
               onGameSelect={onGameSelect}
-              excludeList={guesses.map((g) => g.id)}
-              similarList={[]}
+              guesses={guesses}
             />
             <Button variant="destructive" onClick={giveUp}>
               Give Up
             </Button>
           </div>
         ) : (
-          <ResultMessage won={won && lifes != 0} />
+          <ResultMessage won={won && lives != 0} />
         )}
 
         <Hints game={game} />
       </div>
 
       <div className="flex flex-col gap-9 w-1/2">
-        <Lives />
+        <Lives totalLives={5} currentLives={lives} />
         <Stats />
-        <Guesses />
+        <Guesses guesses={guesses} />
       </div>
     </div>
   );

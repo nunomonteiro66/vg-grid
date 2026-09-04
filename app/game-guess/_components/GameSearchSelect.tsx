@@ -1,18 +1,17 @@
-import { ComponentProps, useMemo, useRef, useState } from "react";
+import { ComponentProps, useEffect, useMemo, useRef, useState } from "react";
 import SearchableSelect from "./SearchableSelect";
 import { GameSearchResult, searchGames } from "@/app/lib/api/games";
 import { DropdownItem, DropdownItemvariant } from "./ui/types";
+import { Guess } from "../page";
 
 type GameSearchSelectProps = ComponentProps<"div"> & {
   onGameSelect: (game: GameSearchResult) => void;
-  excludeList: Array<number>;
-  similarList: Array<number>;
+  guesses: Guess[];
 };
 
 export default function GameSearchSelect({
   onGameSelect,
-  excludeList,
-  similarList,
+  guesses,
   ...props
 }: GameSearchSelectProps) {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -20,14 +19,15 @@ export default function GameSearchSelect({
 
   const currentGames = useMemo(() => {
     return results.map((res) => {
-      let variant = "default";
-      let disabled = false;
-      if (excludeList.includes(res.id)) {
-        variant = "danger";
-        disabled = true;
-      } else if (similarList.includes(res.id)) {
-        variant = "warning";
-      }
+      const guessed = guesses.find((guess) => guess.id == res.id);
+
+      let disabled = guessed! != undefined;
+
+      let variant = guessed
+        ? guessed.close
+          ? "warning"
+          : "danger"
+        : "default";
 
       return {
         id: res.id,
@@ -37,7 +37,7 @@ export default function GameSearchSelect({
         variant: variant as DropdownItemvariant,
       };
     });
-  }, [results, excludeList, similarList]);
+  }, [results, guesses]);
 
   const handleSearch = (search: string) => {
     if (search.trim().length === 0) {
@@ -55,7 +55,7 @@ export default function GameSearchSelect({
   };
 
   const onOptionSelect = (game: DropdownItem) => {
-    onGameSelect(results.find((game) => game.id === game.id)!);
+    onGameSelect(results.find((gameR) => gameR.id === game.id)!);
   };
 
   return (

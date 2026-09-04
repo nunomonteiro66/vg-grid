@@ -29,6 +29,7 @@ export async function search(
       franchise: {
         select: {
           name: true,
+          id: true,
         },
       },
     },
@@ -45,7 +46,7 @@ export async function search(
     igdbId: game.igdbId,
     name: game.name,
     coverUrl: game.coverUrl ?? undefined,
-    franchise: game.franchise?.name ?? null,
+    franchise: game.franchise ?? null,
   }));
 }
 

@@ -33,8 +33,6 @@ export default function Hints({ game }: HintsProps) {
     ].filter((hint) => hint.value);
   }, [game]);
 
-  console.log(game);
-
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-3">
