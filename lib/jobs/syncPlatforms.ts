@@ -12,7 +12,7 @@ export async function syncPlatforms() {
 
   while (true) {
     const response: Response[] = await igdbRequest(
-      "games",
+      "platforms",
       `
           fields name;
           limit 500;
