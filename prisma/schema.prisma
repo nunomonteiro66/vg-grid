@@ -21,6 +21,8 @@ model Games {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   description String?
+  releaseDate DateTime?
+  totalRating Float?
 
   franchiseId Int?
   franchise   Franchises? @relation(fields: [franchiseId], references: [id])

@@ -14,6 +14,8 @@ type Response = {
   summary: string;
   franchises: number[];
   genres: number[];
+  first_release_date: number;
+  total_rating: number;
 };
 
 export async function syncGames() {
@@ -24,7 +26,7 @@ export async function syncGames() {
     const response: Response[] = await igdbRequest(
       "games",
       `
-      fields name, cover.url, summary, franchises, genres;
+      fields name, cover.url, summary, franchises, genres, total_rating, first_release_date;
       limit 500;
       offset ${offset};
       sort id asc;
@@ -74,6 +76,10 @@ export async function syncGames() {
           coverUrl: game.cover?.url,
           description: game.summary,
           franchiseId,
+          releaseDate: game.first_release_date
+            ? new Date(game.first_release_date * 1000)
+            : undefined,
+          totalRating: Math.round(game.total_rating),
           genres: {
             deleteMany: {},
             create: genreRows.map((g) => ({ genreId: g.id })),
@@ -85,6 +91,10 @@ export async function syncGames() {
           coverUrl: game.cover?.url,
           description: game.summary,
           franchiseId,
+          releaseDate: game.first_release_date
+            ? new Date(game.first_release_date * 1000)
+            : undefined,
+          totalRating: Math.round(game.total_rating),
           genres: {
             create: genreRows.map((g) => ({ genreId: g.id })),
           },
