@@ -1,93 +1,58 @@
 "use client";
 
 import SearchInput from "./_components/ui/SearchInput";
-import { Card, Popover, Separator, TextField } from "@radix-ui/themes";
+import { Popover, Separator, TextField } from "@radix-ui/themes";
 import { ComponentProps, useEffect, useRef, useState } from "react";
 import type { Game as GameType } from "@/lib/igdb/helpers/types";
 import ImgCarousel, { CarouselImg } from "@/components/ImgCarousel";
 import { BookmarkIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
-import { InfoIcon } from "lucide-react";
+import { InfoIcon, Lightbulb } from "lucide-react";
 import DialogSearch from "./_components/DialogSearch";
 import BlanksText from "@/components/BlanksText";
 import GameSearchSelect from "./_components/GameSearchSelect";
-
-function Header({
-  lifes,
-  hintsRemaining,
-}: {
-  lifes: number;
-  hintsRemaining: number;
-}) {
-  return (
-    <div className="flex justify-between">
-      <Card>
-        <div className="flex gap-1.5 items-center">
-          <label>Lifes remaining</label>
-          <Separator orientation="vertical" />
-          <p>{lifes}</p>
-        </div>
-      </Card>
-
-      <Card>
-        <div className="flex gap-1.5 items-center">
-          <label>Hints remaining</label>
-          <Separator orientation="vertical" />
-          <p>{hintsRemaining}</p>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function ResultMessage({ won = false }: { won: boolean }) {
-  return (
-    <div className={`border-2 ${won ? "text-green-700" : "text-red-700"}`}>
-      {won ? (
-        <div>
-          CORRECT!!! <br />
-          Nicely done
-        </div>
-      ) : (
-        <div>
-          FAILED!!! <br /> BETTER LUCK NEXT TIME{" "}
-        </div>
-      )}
-    </div>
-  );
-}
+import SearchableSelect from "./_components/SearchableSelect";
+import ResultMessage from "./_components/ResultMessage";
+import Lives from "./_components/Lives";
+import Stats from "./_components/Stats";
+import Guesses from "./_components/Guesses";
+import Hints from "./_components/Hints";
+import { RandomGame } from "@/lib/db/games";
+import { GameSearchResult } from "../lib/api/games";
 
 export default function GameGuess() {
   const [lifes, setLifes] = useState(5);
   const [hintsRemaining, setHintsRemaining] = useState(6);
-  const [hints, setHints] = useState<{ type: string; value: string }[]>([]);
-  const [game, setGame] = useState<GameType>();
+  const [game, setGame] = useState<RandomGame>();
   const [guesses, setGuesses] = useState<Pick<GameType, "id" | "name">[]>([]);
 
-  const [wrong, setWrong] = useState<Pick<GameType, "id" | "name">[]>([]); //games that are completly wrong
+  const [wrong, setWrong] = useState<Pick<GameType, "id" | "name">[]>([]); //games that are completely wrong
   const [close, setClose] = useState<Pick<GameType, "id" | "name">[]>([]); //games that are similar ot the answer (same franchise)
 
   const [won, setWon] = useState(false);
+
+  const hints = ["RELEASE DATE", "GENRE", "DEVELOPER", "PLATFORMS"];
 
   useEffect(() => {
     const getRandomGame = async () => {
       const response = await fetch(`/api/games/random`);
 
-      const results = (await response.json()) as GameType[];
+      const results = (await response.json()) as RandomGame[];
 
       setGame(results[0]);
     };
     getRandomGame();
   }, []);
 
-  const onGameSelect = (guessedGame: { id: number; name: string }) => {
-    console.log(game);
-    console.log(guessedGame);
+  const onGameSelect = (guessedGame: GameSearchResult) => {
     //check if guess is correct
     if (game?.id === guessedGame.id) {
       setWon(true);
     } else {
-      if (game?.franchise && guessedGame.franchise) {
+      if (game?.franchiseId === guessedGame.franchise.id) {
+        setClose([...close, game]);
+      } else {
+        setWrong([...wrong, game!]);
       }
 
       setGuesses([...guesses, guessedGame]);
@@ -95,72 +60,27 @@ export default function GameGuess() {
     }
   };
 
-  const getHint = () => {
-    const newHint = {
-      type: "",
-      value: "",
-    };
-    const defaultHint = "Unknown";
-    switch (hintsRemaining) {
-      case 1:
-        const platforms = game?.platforms
-          ? game.platforms.map((plat) => plat.name)
-          : [];
-        newHint.type = "Platforms";
-        newHint.value =
-          platforms.length != 0 ? platforms.join(", ") : defaultHint;
-        break;
-
-      case 2:
-        const releaseDate = game?.release_date;
-        newHint.type = "Release Date";
-        newHint.value = releaseDate
-          ? new Date(releaseDate).toLocaleDateString("pt-PT")
-          : defaultHint;
-        break;
-
-      case 3:
-        const genres = game?.genres.map((g) => g.name);
-        newHint.type = "Genres";
-        newHint.value = genres ? genres.join(", ") : defaultHint;
-        break;
-      case 4:
-        newHint.type = "Rating";
-        newHint.value = game?.total_rating
-          ? String(game?.total_rating)
-          : "Unknown";
-        break;
-      case 5:
-        newHint.type = "Developers";
-        newHint.value = game?.developers
-          ? game.developers.map((d) => d.name).join(", ")
-          : "Unknown";
-        break;
-      case 6:
-        newHint.type = "Publishers";
-        newHint.value = game?.publishers
-          ? game.publishers.map((d) => d.name).join(", ")
-          : "Unknown";
-        break;
-    }
-    setHints([...hints, newHint]);
-    setHintsRemaining(hintsRemaining - 1);
-  };
-
   const giveUp = () => {
     setLifes(0);
   };
 
+  const isLocal = process.env.NODE_ENV !== "production";
+
   return (
-    <div className="gap-7 flex flex-col">
-      <Header lifes={lifes} hintsRemaining={hintsRemaining} />
-      {game?.name} {game?.id} {game?.franchise?.name}
-      <div className="flex flex-col gap-3 max-w-125">
+    <div className="flex gap-9">
+      <div className="flex flex-col bg-[#262323] p-4 gap-3 w-2/3">
+        {isLocal && (
+          <p className="bg-yellow-900 text-yellow-200 p-1 text-xs">
+            DEV: answer is {game?.name ?? "loading..."}
+          </p>
+        )}
+
         {game ? (
           <ImgCarousel imgs={game?.screenshots as CarouselImg[]} />
         ) : (
           <div className="w-125 h-70"></div>
         )}
+
         <div className="flex whitespace-pre flex-wrap">
           {lifes != 0 && !won ? (
             <BlanksText text={game?.name ?? ""} />
@@ -179,15 +99,6 @@ export default function GameGuess() {
               excludeList={guesses.map((g) => g.id)}
               similarList={[]}
             />
-            <Button
-              variant="outline"
-              size="icon"
-              aria-label="hint"
-              onClick={getHint}
-              disabled={hintsRemaining === 0}
-            >
-              <InfoIcon />
-            </Button>
             <Button variant="destructive" onClick={giveUp}>
               Give Up
             </Button>
@@ -196,29 +107,13 @@ export default function GameGuess() {
           <ResultMessage won={won && lifes != 0} />
         )}
 
-        <div className="flex">
-          <div className="flex flex-1 justify-center ">
-            <div className="flex flex-col">
-              <p className="text-xl text-red-700 text-center">Guesses</p>
-              {guesses.map((guess, i) => (
-                <p key={`guess-${i}`} className="text-[14px] text-red-700">
-                  {guess.name}
-                </p>
-              ))}
-            </div>
-          </div>
-          <Separator orientation="vertical" className="h-full" />
-          <div className="flex flex-1 justify-center ">
-            <div className="flex flex-col">
-              <p className="text-xl text-blue-900 text-center">Hints</p>
-              {hints.map((hint, i) => (
-                <span key={`hint-${i}`} className="text-[14px] text-blue-900">
-                  <u>{hint.type}:</u> {hint.value}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
+        <Hints game={game} />
+      </div>
+
+      <div className="flex flex-col gap-9 w-1/2">
+        <Lives />
+        <Stats />
+        <Guesses />
       </div>
     </div>
   );

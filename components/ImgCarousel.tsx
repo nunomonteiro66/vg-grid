@@ -30,7 +30,7 @@ type ExpandableImageProps = {
 
 function Image({ src, alt, expandable = false }: ExpandableImageProps) {
   const image = (
-    <div className="relative w-full aspect-video overflow-hidden rounded-md">
+    <div className="relative w-full aspect-video overflow-hidden rounded-md flex justify-center">
       <img src={src} alt={alt} width="500" height="1080" />
     </div>
   );

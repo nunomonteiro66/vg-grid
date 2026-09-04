@@ -3,14 +3,8 @@ import SearchableSelect from "./SearchableSelect";
 import { GameSearchResult, searchGames } from "@/app/lib/api/games";
 import { DropdownItem, DropdownItemvariant } from "./ui/types";
 
-type onGameSelectType = {
-  id: number;
-  name: string;
-  franchiseId?: number;
-};
-
 type GameSearchSelectProps = ComponentProps<"div"> & {
-  onGameSelect: (game: onGameSelectType) => void;
+  onGameSelect: (game: GameSearchResult) => void;
   excludeList: Array<number>;
   similarList: Array<number>;
 };
@@ -61,11 +55,7 @@ export default function GameSearchSelect({
   };
 
   const onOptionSelect = (game: DropdownItem) => {
-    //setCurrentGames([]);
-    onGameSelect({
-      id: game.id,
-      name: game.name,
-    });
+    onGameSelect(results.find((game) => game.id === game.id)!);
   };
 
   return (

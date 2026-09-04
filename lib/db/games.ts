@@ -64,6 +64,8 @@ export async function getGameById(id: number) {
   });
 }
 
+export type RandomGame = Awaited<ReturnType<typeof getRandomGames>>[number];
+
 export async function getRandomGames(n: number) {
   const total = await prisma.games.count();
 
@@ -83,6 +85,24 @@ export async function getRandomGames(n: number) {
           name: true,
         },
       },
+      genres: {
+        select: {
+          genre: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      platforms: {
+        select: {
+          platform: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -92,6 +112,8 @@ export async function getRandomGames(n: number) {
   return gamesFromDb.map((g) => {
     return {
       ...g,
+      genres: g.genres.map(({ genre }) => genre),
+      platforms: g.platforms.map(({ platform }) => platform),
       screenshots: screenshots.map((sc) => ({
         ...sc,
         url: sc.url.replace("t_thumb", "t_1080p"),
