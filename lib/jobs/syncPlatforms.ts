@@ -39,5 +39,7 @@ export async function syncPlatforms() {
         },
       });
     }
+
+    offset += 500;
   }
 }
