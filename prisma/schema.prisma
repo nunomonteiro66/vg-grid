@@ -24,6 +24,8 @@ model Games {
 
   franchiseId Int?
   franchise   Franchises? @relation(fields: [franchiseId], references: [id])
+
+  genres GamesOnGenres[]
 }
 
 
@@ -33,4 +35,22 @@ model Franchises {
   name   String
 
   games Games[]
+}
+
+model Genres {
+  id  Int @id @default(autoincrement())
+  igdbId  Int @unique
+  name  String
+
+  games GamesOnGenres[]
+}
+
+model GamesOnGenres {
+  gameId  Int
+  game  Games @relation(fields: [gameId], references: [id])
+
+  genreId Int
+  genre Genres  @relation(fields: [genreId], references: [id])
+
+  @@id([gameId, genreId])
 }

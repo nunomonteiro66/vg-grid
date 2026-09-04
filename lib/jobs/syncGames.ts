@@ -4,15 +4,27 @@ import { igdbRequest } from "../igdb/client";
 import { fullGameConditions } from "../igdb/helpers/fullgame-conditions";
 import prisma from "@/lib/prisma";
 
+type Response = {
+  id: number;
+  name: string;
+  cover: {
+    id: number;
+    url: string;
+  };
+  summary: string;
+  franchises: number[];
+  genres: number[];
+};
+
 export async function syncGames() {
   let offset = 0;
   let total = 0;
 
   while (true) {
-    const response = await igdbRequest(
+    const response: Response[] = await igdbRequest(
       "games",
       `
-      fields name, cover.url, summary, franchises;
+      fields name, cover.url, summary, franchises, genres;
       limit 500;
       offset ${offset};
       sort id asc;
@@ -36,8 +48,23 @@ export async function syncGames() {
       )?.id;
     };
 
+    const fetchGenres = async (igdbIds: number[]) => {
+      if (!igdbIds || igdbIds.length === 0) return null;
+
+      return await prisma.genres.findMany({
+        where: {
+          igdbId: {
+            in: igdbIds,
+          },
+        },
+      });
+    };
+
     for (const game of response) {
       total++;
+      const franchiseId = await fetchFranchiseId(game?.franchises?.[0]);
+      const genreRows = (await fetchGenres(game.genres)) ?? [];
+
       await prisma.games.upsert({
         where: {
           igdbId: game.id,
@@ -46,14 +73,21 @@ export async function syncGames() {
           name: game.name,
           coverUrl: game.cover?.url,
           description: game.summary,
-          franchiseId: await fetchFranchiseId(game?.franchises?.[0]),
+          franchiseId,
+          genres: {
+            deleteMany: {},
+            create: genreRows.map((g) => ({ genreId: g.id })),
+          },
         },
         create: {
           igdbId: game.id,
           name: game.name,
           coverUrl: game.cover?.url,
           description: game.summary,
-          franchiseId: await fetchFranchiseId(game?.franchises?.[0]),
+          franchiseId,
+          genres: {
+            create: genreRows.map((g) => ({ genreId: g.id })),
+          },
         },
       });
     }
