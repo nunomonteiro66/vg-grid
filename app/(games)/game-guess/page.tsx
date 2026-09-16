@@ -19,6 +19,7 @@ import Guesses from "./_components/Guesses";
 import Hints from "./_components/Hints";
 import { RandomGame } from "@/lib/db/games";
 import { GameSearchResult } from "@/app/lib/api/games";
+import Header from "../_components/Header";
 
 export type Guess = {
   id: number;
@@ -71,53 +72,56 @@ export default function GameGuess() {
   const isLocal = process.env.NODE_ENV !== "production";
 
   return (
-    <div className="flex gap-9">
-      <div className="flex flex-col bg-[#262323] p-4 gap-3 w-2/3">
-        {isLocal && (
-          <p className="bg-yellow-900 text-yellow-200 p-1 text-xs">
-            DEV: answer is {game?.name ?? "loading..."} - {game?.id}
-          </p>
-        )}
-
-        {game ? (
-          <ImgCarousel imgs={game?.screenshots as CarouselImg[]} />
-        ) : (
-          <div className="w-125 h-70"></div>
-        )}
-
-        <div className="flex whitespace-pre flex-wrap">
-          {lives != 0 && !won ? (
-            <BlanksText text={game?.name ?? ""} />
-          ) : (
-            <>
-              <p>{game?.name}</p>
-            </>
+    <>
+      <Header pageTitle={"GAME GUESS"}></Header>
+      <div className="flex gap-9">
+        <div className="flex flex-col bg-[#262323] p-4 gap-3 w-2/3">
+          {isLocal && (
+            <p className="bg-yellow-900 text-yellow-200 p-1 text-xs">
+              DEV: answer is {game?.name ?? "loading..."} - {game?.id}
+            </p>
           )}
+
+          {game ? (
+            <ImgCarousel imgs={game?.screenshots as CarouselImg[]} />
+          ) : (
+            <div className="w-125 h-70"></div>
+          )}
+
+          <div className="flex whitespace-pre flex-wrap">
+            {lives != 0 && !won ? (
+              <BlanksText text={game?.name ?? ""} />
+            ) : (
+              <>
+                <p>{game?.name}</p>
+              </>
+            )}
+          </div>
+
+          {!won && lives !== 0 ? (
+            <div className="flex gap-2 w-full">
+              <GameSearchSelect
+                className="w-full"
+                onGameSelect={onGameSelect}
+                guesses={guesses}
+              />
+              <Button variant="destructive" onClick={giveUp}>
+                Give Up
+              </Button>
+            </div>
+          ) : (
+            <ResultMessage won={won && lives != 0} />
+          )}
+
+          <Hints game={game} />
         </div>
 
-        {!won && lives !== 0 ? (
-          <div className="flex gap-2 w-full">
-            <GameSearchSelect
-              className="w-full"
-              onGameSelect={onGameSelect}
-              guesses={guesses}
-            />
-            <Button variant="destructive" onClick={giveUp}>
-              Give Up
-            </Button>
-          </div>
-        ) : (
-          <ResultMessage won={won && lives != 0} />
-        )}
-
-        <Hints game={game} />
+        <div className="flex flex-col gap-9 w-1/2">
+          <Lives totalLives={5} currentLives={lives} />
+          <Stats />
+          <Guesses guesses={guesses} />
+        </div>
       </div>
-
-      <div className="flex flex-col gap-9 w-1/2">
-        <Lives totalLives={5} currentLives={lives} />
-        <Stats />
-        <Guesses guesses={guesses} />
-      </div>
-    </div>
+    </>
   );
 }
