@@ -9,7 +9,6 @@ import Header from "../_components/Header";
 import { RandomGame } from "@/lib/db/games";
 import { Dialog } from "radix-ui";
 import { CustomDialog } from "@/components/CustomDialog";
-import MessageDialog from "@/components/MessageDialog";
 
 export default function GameGrid() {
   const [games, setGames] = useState<RandomGame[]>();
