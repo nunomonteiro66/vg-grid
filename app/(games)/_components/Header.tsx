@@ -1,11 +1,16 @@
 import { Separator } from "radix-ui";
 
-export default function Header({ pageTitle, children }) {
+type HeaderProps = {
+  pageTitle: string;
+  children: React.ReactNode;
+};
+
+export default function Header({ pageTitle, children }: HeaderProps) {
   return (
-    <header className="flex flex-col">
-      <div className="flex justify-between items-center min-h-15">
+    <header className="w-screen relative left-1/2 right-1/2 mx-[-50vw] mb-6 pb-2">
+      <div className="flex justify-between items-center min-h-15 ml-6 mr-6">
         <h1>{pageTitle}</h1>
-        <p>asdasd</p>
+        {children}
       </div>
       <Separator.Root
         className="mb-5 h-0.5 bg-gray-500"

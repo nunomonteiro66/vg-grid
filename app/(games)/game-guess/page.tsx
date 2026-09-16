@@ -73,7 +73,7 @@ export default function GameGuess() {
 
   return (
     <>
-      <Header pageTitle={"GAME GUESS"}></Header>
+      <Header pageTitle={"GAME GUESS"}>streak goes here</Header>
       <div className="flex gap-9">
         <div className="flex flex-col bg-[#262323] p-4 gap-3 w-2/3">
           {isLocal && (

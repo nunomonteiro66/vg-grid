@@ -74,7 +74,7 @@ export async function getRandomGames(n: number) {
     Math.round(Math.random() * total),
   );
 
-  const gamesFromDb = await prisma.games.findMany({
+  return await prisma.games.findMany({
     where: {
       id: {
         in: randomNmbs,
@@ -104,21 +104,13 @@ export async function getRandomGames(n: number) {
           },
         },
       },
+      screenshots: {
+        select: {
+          url: true,
+          height: true,
+          width: true,
+        },
+      },
     },
-  });
-
-  const screenshots = await getScreenshots(gamesFromDb.map((g) => g.igdbId));
-
-  //get the screenshots for the games
-  return gamesFromDb.map((g) => {
-    return {
-      ...g,
-      genres: g.genres.map(({ genre }) => genre),
-      platforms: g.platforms.map(({ platform }) => platform),
-      screenshots: screenshots.map((sc) => ({
-        ...sc,
-        url: sc.url.replace("t_thumb", "t_1080p"),
-      })),
-    };
   });
 }

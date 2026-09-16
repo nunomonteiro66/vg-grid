@@ -1,4 +1,5 @@
-import { Game } from "@/lib/igdb/helpers/types";
+"use client";
+
 import React, { ComponentProps, useRef, useState } from "react";
 import ImgCarousel from "@/components/ImgCarousel";
 import BlanksText from "@/components/BlanksText";
@@ -6,9 +7,12 @@ import { CustomDialog } from "@/components/CustomDialog";
 import GameSearchSelect from "@/app/(games)/game-guess/_components/GameSearchSelect";
 import { IconButton } from "@radix-ui/themes";
 import { Expand } from "lucide-react";
+import { Guess } from "../../game-guess/page";
+import { GameSearchResult } from "@/app/lib/api/games";
+import { RandomGame } from "@/lib/db/games";
 
 type GameSquareProps = ComponentProps<"div"> & {
-  game?: Game;
+  game?: RandomGame;
   gameOver: boolean;
   setGameWon: () => void;
   reduceLife: () => void;
@@ -41,17 +45,27 @@ export default function GameSquare({
   ...props
 }: GameSquareProps) {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [wrongGuesses, setWrongGuesses] = useState<number[]>([]);
   const [revealed, setRevealed] = useState(false);
   const [won, setWon] = useState(true);
   const hideAnswer = !revealed && !gameOver;
+  const [guesses, setGuesses] = useState<Guess[]>([]);
 
-  const checkGameSelect = (gameId: number) => {
-    if (game?.id === gameId) {
+  const checkGameSelect = (guessedGame: GameSearchResult) => {
+    if (game?.id === guessedGame.id) {
       setRevealed(true);
       setGameWon();
     } else {
-      setWrongGuesses([...wrongGuesses, gameId]);
+      setGuesses((prev) => {
+        const isClose = game?.franchiseId === guessedGame.franchise?.id;
+        return [
+          ...prev,
+          {
+            id: guessedGame.id,
+            name: guessedGame.name,
+            close: isClose,
+          },
+        ];
+      });
       reduceLife();
     }
   };
@@ -59,27 +73,28 @@ export default function GameSquare({
   const Square = (
     <>
       {game?.name}
-      <ImgCarousel
-        imgs={game?.screenshots ?? []}
-        selectedIndex={selectedImage}
-        onImageChange={setSelectedImage}
-      />
+      <div key={game?.id}>
+        <ImgCarousel
+          imgs={game?.screenshots ?? []}
+          selectedIndex={selectedImage}
+          onImageChange={setSelectedImage}
+        />
+      </div>
       <div className="flex flex-col justify-between h-full gap-2">
         {hideAnswer ? (
-          <BlanksText
-            text={game?.name ?? ""}
-            className="border-2 border-gray-400 min-h-6"
-          />
+          <>
+            <BlanksText
+              text={game?.name ?? ""}
+              className="border-2 border-gray-400 min-h-6"
+            />
+            <GameSearchSelect
+              onGameSelect={checkGameSelect}
+              guesses={guesses}
+            ></GameSearchSelect>
+          </>
         ) : (
           <>{game?.name}</>
         )}
-        <GameSearchSelect
-          excludeList={wrongGuesses}
-          similarList={[]}
-          onGameSelect={(game) => {
-            checkGameSelect(game.id);
-          }}
-        ></GameSearchSelect>
       </div>
     </>
   );
