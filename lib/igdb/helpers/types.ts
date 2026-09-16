@@ -5,6 +5,7 @@ type DefaultObj = {
 
 export type Screenshot = {
   id: number;
+  game: number;
   url: string;
   width: number;
   height: number;

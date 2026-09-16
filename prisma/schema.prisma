@@ -30,6 +30,8 @@ model Games {
   genres GamesOnGenres[]
   
   platforms GamesOnPlatforms[]
+
+  screenshots Screenshots[]
 }
 
 
@@ -75,4 +77,15 @@ model GamesOnPlatforms {
   platform  Platforms @relation(fields: [platformId], references: [id])
 
   @@id([gameId, platformId])
+}
+
+model Screenshots {
+  id     Int @id @default(autoincrement())
+  igdbId Int @unique
+  url    String
+  width  Int
+  height Int
+
+  gameId Int
+  game   Games @relation(fields: [gameId], references: [id])
 }

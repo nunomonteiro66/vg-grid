@@ -2,6 +2,7 @@ import { syncFranchises } from "./syncFranchises";
 import { syncGames } from "./syncGames";
 import { syncGenres } from "./syncGenres";
 import { syncPlatforms } from "./syncPlatforms";
+import { syncScreenshots } from "./syncScreenshots";
 
 export async function syncAll() {
   await syncGenres();
@@ -12,4 +13,6 @@ export async function syncAll() {
   console.log("Successfully sync platforms");
   await syncGames();
   console.log("Successfully sync games");
+  await syncScreenshots();
+  console.log("Successfully sync screenshots");
 }
