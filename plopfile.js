@@ -8,12 +8,12 @@ export default function (plop) {
         message: "Where should the component live?",
         choices: [
           {
-            name: "Game-guess UI primitive (app/game-guess/_components/ui)",
-            value: "app/game-guess/_components/ui",
+            name: "Game-guess UI primitive (app/(games)/game-guess/_components/ui)",
+            value: "app/(games)/game-guess/_components/ui",
           },
           {
-            name: "Game-guess feature component (app/game-guess/_components)",
-            value: "app/game-guess/_components",
+            name: "Game-guess feature component (app/(games)/game-guess/_components)",
+            value: "app/(games)/game-guess/_components",
           },
           {
             name: "Shared component (components)",

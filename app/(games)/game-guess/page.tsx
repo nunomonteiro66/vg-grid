@@ -18,7 +18,7 @@ import Stats from "./_components/Stats";
 import Guesses from "./_components/Guesses";
 import Hints from "./_components/Hints";
 import { RandomGame } from "@/lib/db/games";
-import { GameSearchResult } from "../lib/api/games";
+import { GameSearchResult } from "@/app/lib/api/games";
 
 export type Guess = {
   id: number;

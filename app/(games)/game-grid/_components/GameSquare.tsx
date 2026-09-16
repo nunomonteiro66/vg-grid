@@ -3,7 +3,7 @@ import React, { ComponentProps, useRef, useState } from "react";
 import ImgCarousel from "@/components/ImgCarousel";
 import BlanksText from "@/components/BlanksText";
 import { CustomDialog } from "@/components/CustomDialog";
-import GameSearchSelect from "@/app/game-guess/_components/GameSearchSelect";
+import GameSearchSelect from "@/app/(games)/game-guess/_components/GameSearchSelect";
 import { IconButton } from "@radix-ui/themes";
 import { Expand } from "lucide-react";
 
