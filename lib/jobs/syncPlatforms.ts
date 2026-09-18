@@ -26,7 +26,7 @@ export async function syncPlatforms() {
     for (const platform of response) {
       total++;
 
-      await prisma.platforms.upsert({
+      await prisma.platform.upsert({
         where: {
           igdbId: platform.id,
         },

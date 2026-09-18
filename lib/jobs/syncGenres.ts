@@ -20,7 +20,7 @@ export async function syncGenres() {
 
     for (const genre of response) {
       total++;
-      await prisma.genres.upsert({
+      await prisma.genre.upsert({
         where: {
           igdbId: genre.id,
         },

@@ -40,7 +40,7 @@ export async function syncGames() {
     const fetchFranchiseId = async (igdbId: number) => {
       if (!igdbId) return null;
       return (
-        await prisma.franchises.findUnique({
+        await prisma.franchise.findUnique({
           select: {
             id: true,
           },
@@ -54,7 +54,7 @@ export async function syncGames() {
     const fetchGenres = async (igdbIds: number[]) => {
       if (!igdbIds || igdbIds.length === 0) return null;
 
-      return await prisma.genres.findMany({
+      return await prisma.genre.findMany({
         where: {
           igdbId: {
             in: igdbIds,
@@ -66,7 +66,7 @@ export async function syncGames() {
     const fetchPlatforms = async (igdbIds: number[]) => {
       if (!igdbIds || igdbIds.length === 0) return null;
 
-      return await prisma.platforms.findMany({
+      return await prisma.platform.findMany({
         where: {
           igdbId: {
             in: igdbIds,
@@ -81,7 +81,7 @@ export async function syncGames() {
       const genreRows = (await fetchGenres(game.genres)) ?? [];
       const platformsRows = (await fetchPlatforms(game.platforms)) ?? [];
 
-      await prisma.games.upsert({
+      await prisma.game.upsert({
         where: {
           igdbId: game.id,
         },

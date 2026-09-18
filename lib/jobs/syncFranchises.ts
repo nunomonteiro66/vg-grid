@@ -21,7 +21,7 @@ export async function syncFranchises() {
 
     for (const franchise of response) {
       total++;
-      await prisma.franchises.upsert({
+      await prisma.franchise.upsert({
         where: {
           igdbId: franchise.id,
         },

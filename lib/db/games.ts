@@ -19,7 +19,7 @@ export async function search(
 
   const query = `${sanitized.split(/\s+/).join("&")}:*`;
 
-  const games = await prisma.games.findMany({
+  const games = await prisma.game.findMany({
     select: {
       id: true,
       igdbId: true,
@@ -51,7 +51,7 @@ export async function search(
 }
 
 export async function getGameById(id: number) {
-  return prisma.games.findUnique({
+  return prisma.game.findUnique({
     where: {
       id,
     },
@@ -68,13 +68,13 @@ export async function getGameById(id: number) {
 export type RandomGame = Awaited<ReturnType<typeof getRandomGames>>[number];
 
 export async function getRandomGames(n: number) {
-  const total = await prisma.games.count();
+  const total = await prisma.game.count();
 
   const randomNmbs = Array.from({ length: n }).map((n) =>
     Math.round(Math.random() * total),
   );
 
-  return await prisma.games.findMany({
+  return await prisma.game.findMany({
     where: {
       id: {
         in: randomNmbs,

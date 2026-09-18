@@ -13,7 +13,18 @@ datasource db {
   provider = "postgresql"
 }
 
-model Games {
+model Day {
+  id     Int      @id @default(autoincrement())
+  date   DateTime @unique @db.Date  // just the date, no time component
+
+  dailyGameId Int?  @unique
+  dailyGame   Game? @relation(fields: [dailyGameId], references: [id])
+
+  gridSlots     GridSlot[]
+  dailyAttempts DailyAttempt[]
+}
+
+model Game {
   id          Int      @id @default(autoincrement())
   igdbId      Int      @unique
   name        String
@@ -25,61 +36,69 @@ model Games {
   totalRating Float?
 
   franchiseId Int?
-  franchise   Franchises? @relation(fields: [franchiseId], references: [id])
+  franchise   Franchise? @relation(fields: [franchiseId], references: [id])
 
-  genres GamesOnGenres[]
-  
-  platforms GamesOnPlatforms[]
+  dailyFor  Day?
 
-  screenshots Screenshots[]
+  genres GameOnGenre[]
+
+  platforms GameOnPlatform[]
+
+  screenshots Screenshot[]
+
+  gridSlots GridSlot[]
+
+  gridGuesses GridGuess[]
+
+  dailyAttempts DailyAttempt[]
 }
 
 
-model Franchises {
+model Franchise {
   id     Int    @id @default(autoincrement())
   igdbId Int    @unique
   name   String
 
-  games Games[]
+  games Game[]
 }
 
-model Genres {
+model Genre {
   id  Int @id @default(autoincrement())
   igdbId  Int @unique
   name  String
 
-  games GamesOnGenres[]
+  games GameOnGenre[]
 }
 
-model GamesOnGenres {
+model GameOnGenre {
   gameId  Int
-  game  Games @relation(fields: [gameId], references: [id])
+  game  Game @relation(fields: [gameId], references: [id])
 
   genreId Int
-  genre Genres  @relation(fields: [genreId], references: [id])
+  genre Genre  @relation(fields: [genreId], references: [id])
 
   @@id([gameId, genreId])
 }
 
-model Platforms {
+model Platform {
   id  Int @id @default(autoincrement())
   igdbId  Int @unique
   name  String
 
-  games GamesOnPlatforms[]
+  games GameOnPlatform[]
 }
 
-model GamesOnPlatforms {
+model GameOnPlatform {
   gameId  Int
-  game  Games @relation(fields: [gameId], references: [id])
+  game  Game @relation(fields: [gameId], references: [id])
 
   platformId  Int
-  platform  Platforms @relation(fields: [platformId], references: [id])
+  platform  Platform @relation(fields: [platformId], references: [id])
 
   @@id([gameId, platformId])
 }
 
-model Screenshots {
+model Screenshot {
   id     Int @id @default(autoincrement())
   igdbId Int @unique
   url    String
@@ -87,5 +106,69 @@ model Screenshots {
   height Int
 
   gameId Int
-  game   Games @relation(fields: [gameId], references: [id])
+  game   Game @relation(fields: [gameId], references: [id])
+}
+
+
+model GridSlot {
+  id Int  @id @default(autoincrement())
+
+  dayId Int
+  day      Day  @relation(fields: [dayId], references: [id])
+
+  position  Int
+  gameId  Int @unique
+  game  Game @relation(fields: [gameId], references: [id])
+
+  gridGuesses GridGuess[]
+
+  @@unique([dayId, position])
+}
+
+model User {
+  id  String @id @default(cuid())
+  username  String @unique
+  email String  @unique
+  passwordHash  String
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  gridGuesses GridGuess[]
+
+  dailyAttempts DailyAttempt[]
+}
+
+model DailyAttempt {
+  id  Int @id @default(autoincrement())
+
+  userId  String
+  user         User     @relation(fields: [userId], references: [id])
+
+  dayId Int
+  day Day @relation(fields: [dayId], references: [id])
+
+  attemptNumber Int
+
+  guessedGameId Int
+  guessedGame   Game    @relation(fields: [guessedGameId], references: [id])
+
+  correct      Boolean
+
+  @@unique([userId, dayId, attemptNumber])
+}
+
+// --- Grid guesses (one row per slot the user has guessed) ---
+model GridGuess {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  gridSlotId Int
+  gridSlot   GridSlot @relation(fields: [gridSlotId], references: [id])
+  guessedGameId Int
+  guessedGame   Game  @relation(fields: [guessedGameId], references: [id])
+  correct    Boolean
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, gridSlotId]) // one guess per user per slot
 }

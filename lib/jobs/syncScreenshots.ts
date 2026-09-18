@@ -16,7 +16,7 @@ export async function syncScreenshots() {
   let total = 0;
 
   while (true) {
-    const games = await prisma.games.findMany({
+    const games = await prisma.game.findMany({
       select: {
         id: true,
         igdbId: true,
@@ -56,7 +56,7 @@ export async function syncScreenshots() {
         if (!gameId) continue;
 
         const url = screenshot.url.replace("t_thumb", "t_1080p");
-        await prisma.screenshots.upsert({
+        await prisma.screenshot.upsert({
           where: {
             igdbId: screenshot.id,
           },
