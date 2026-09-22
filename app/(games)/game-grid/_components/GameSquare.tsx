@@ -7,7 +7,7 @@ import { CustomDialog } from "@/components/CustomDialog";
 import GameSearchSelect from "@/app/(games)/game-guess/_components/GameSearchSelect";
 import { IconButton } from "@radix-ui/themes";
 import { Expand } from "lucide-react";
-import { Guess } from "../../game-guess/page";
+import { Guess } from "../../game-guess/[dayId]/page";
 import { GameSearchResult } from "@/app/lib/api/games";
 import { RandomGame } from "@/lib/db/games";
 

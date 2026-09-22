@@ -2,7 +2,7 @@ import { ComponentProps, useEffect, useMemo, useRef, useState } from "react";
 import SearchableSelect from "./SearchableSelect";
 import { GameSearchResult, searchGames } from "@/app/lib/api/games";
 import { DropdownItem, DropdownItemvariant } from "./ui/types";
-import { Guess } from "../page";
+import { Guess } from "../[dayId]/page";
 
 type GameSearchSelectProps = ComponentProps<"div"> & {
   onGameSelect: (game: GameSearchResult) => void;

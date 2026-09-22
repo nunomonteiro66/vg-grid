@@ -1,6 +1,8 @@
 import { Game } from "@/lib/igdb/helpers/types";
 import prisma from "../prisma";
 import { getScreenshots } from "../igdb/screenshots";
+import { getOnlyDate } from "./helper";
+import { Prisma } from "../generated/prisma/client";
 
 type SearchType = {
   id: number;
@@ -8,6 +10,39 @@ type SearchType = {
   name: string;
   coverUrl?: string;
 };
+
+const gameDetailsInclude = {
+  franchise: {
+    select: {
+      name: true,
+    },
+  },
+  genres: {
+    select: {
+      genre: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  },
+  platforms: {
+    select: {
+      platform: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  },
+  screenshots: {
+    select: {
+      url: true,
+      height: true,
+      width: true,
+    },
+  },
+} satisfies Prisma.GameInclude;
 
 export async function search(
   searchTerm: string,
@@ -113,4 +148,62 @@ export async function getRandomGames(n: number) {
       },
     },
   });
+}
+
+export async function getGameByDate(day: Date) {
+  const nDay = getOnlyDate(day);
+
+  const result = await prisma.day.findUnique({
+    where: {
+      date: nDay,
+    },
+    include: {
+      dailyGame: {
+        include: gameDetailsInclude,
+      },
+    },
+  });
+
+  return result?.dailyGame ?? null;
+}
+
+export async function getGridByDate(day: Date) {
+  const nDay = getOnlyDate(day);
+
+  const result = await prisma.day.findUnique({
+    where: {
+      date: nDay,
+    },
+    include: {
+      gridSlots: {
+        orderBy: {
+          position: "asc",
+        },
+        include: {
+          game: {
+            include: gameDetailsInclude,
+          },
+        },
+      },
+    },
+  });
+
+  return result?.gridSlots ?? [];
+}
+
+export type GameByDayId = Awaited<ReturnType<typeof getGameByDayId>>;
+
+export async function getGameByDayId(dayId: number) {
+  const result = await prisma.day.findUnique({
+    where: {
+      id: dayId,
+    },
+    include: {
+      dailyGame: {
+        include: gameDetailsInclude,
+      },
+    },
+  });
+
+  return result?.dailyGame ?? null;
 }

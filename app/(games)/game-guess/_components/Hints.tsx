@@ -1,20 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { RandomGame } from "@/lib/db/games";
 import { Lightbulb } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
 type HintsProps = {
   game?: RandomGame;
+  hintsUsed: Set<string>;
+  onHintUsed: (hint: string) => void;
 };
 
-export default function Hints({ game }: HintsProps) {
-  const [hintsUsed, setHintsUsed] = useState<Set<string>>();
-
+export default function Hints({ game, hintsUsed, onHintUsed }: HintsProps) {
   const hints = useMemo(() => {
     return [
       {
         label: "PLATFORMS",
-        value: game?.platforms?.map((plat) => plat.name).join(", "),
+        value: game?.platforms?.map((plat) => plat.platform.name).join(", "),
       },
       {
         label: "RELEASE DATE",
@@ -24,7 +24,7 @@ export default function Hints({ game }: HintsProps) {
       },
       {
         label: "GENRE",
-        value: game?.genres?.map((g) => g.name).join(", "),
+        value: game?.genres?.map((g) => g.genre.name).join(", "),
       },
       {
         label: "RATING",
@@ -45,13 +45,7 @@ export default function Hints({ game }: HintsProps) {
             variant="outline"
             className="rounded-none"
             disabled={hintsUsed?.has(hint.label)}
-            onClick={() =>
-              setHintsUsed((prev) => {
-                const next = new Set(prev);
-                next.add(hint.label);
-                return next;
-              })
-            }
+            onClick={() => onHintUsed(hint.label)}
           >
             {hintsUsed?.has(hint.label) ? hint.value : hint.label}
           </Button>

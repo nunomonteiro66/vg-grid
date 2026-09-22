@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Card from "./Card";
-import { Guess } from "../page";
+import { Guess } from "../[dayId]/page";
 
 type Game = {
   id: number;
