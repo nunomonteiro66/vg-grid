@@ -8,6 +8,7 @@ type Day = {
   guesses: Game[];
   hints: string[];
   won: boolean;
+  lost: boolean;
 };
 
 type Game = {
@@ -23,8 +24,8 @@ export function loadProgress() {
   return getItem(PROGRESS_KEY, defaultProgress);
 }
 
-export function loadProgressDay(day: number): Day | undefined {
-  return loadProgress()[day];
+export function loadProgressDayId(dayId: number): Day | undefined {
+  return loadProgress()[dayId];
 }
 
 export function saveProgress(
@@ -32,6 +33,7 @@ export function saveProgress(
   guesses: Game[],
   hints: string[],
   won = false,
+  lost = false,
 ) {
   const currentProgress = loadProgress();
 
@@ -41,6 +43,7 @@ export function saveProgress(
       guesses: guesses,
       hints: hints,
       won: won,
+      lost: lost,
     },
   };
 
@@ -67,6 +70,14 @@ export function saveWon(day: number) {
   const currentProgress = loadProgress();
 
   currentProgress[day].won = true;
+
+  setItem(PROGRESS_KEY, currentProgress);
+}
+
+export function saveLost(day: number) {
+  const currentProgress = loadProgress();
+
+  currentProgress[day].lost = true;
 
   setItem(PROGRESS_KEY, currentProgress);
 }

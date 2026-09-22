@@ -8,6 +8,8 @@ export async function getDayById(id: number) {
   });
 }
 
+export type LatestDay = Awaited<ReturnType<typeof getLatestDay>>;
+
 export async function getLatestDay() {
   return await prisma.day.findFirst({
     select: {
@@ -24,6 +26,7 @@ export type AllDays = Awaited<ReturnType<typeof getAllDays>>;
 export async function getAllDays() {
   return await prisma.day.findMany({
     select: {
+      id: true,
       date: true,
       dailyGame: {
         select: {

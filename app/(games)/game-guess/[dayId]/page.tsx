@@ -27,23 +27,23 @@ import { GameSearchResult, getGameByDayId } from "@/app/lib/api/games";
 import Header from "../../_components/Header";
 import {
   loadProgress,
-  loadProgressDay,
+  loadProgressDayId,
   saveGuess,
   saveHint,
+  saveLost,
   saveProgress,
   saveWon,
 } from "@/lib/storage/progress";
 import { redirect, useParams, useRouter } from "next/navigation";
 import { Day } from "@/lib/generated/prisma/client";
-import { getDayById } from "@/app/lib/api/day";
+import { getDayById, getLatestDay } from "@/app/lib/api/day";
+import { DEFAULT_LIVES } from "@/lib/constants";
 
 export type Guess = {
   id: number;
   name: string;
   close?: boolean;
 };
-
-const DEFAULT_LIVES = 5;
 
 export default function GameGuess() {
   const params = useParams();
@@ -58,6 +58,16 @@ export default function GameGuess() {
 
   const [dayId, setDayId] = useState<number>(1);
   const [day, setDay] = useState<Day>();
+
+  const [lastDayId, setLastDayId] = useState<number>(0);
+
+  useEffect(() => {
+    const getLastDay = async () => {
+      const day = await getLatestDay();
+      setLastDayId(day?.id ?? 0);
+    };
+    getLastDay();
+  }, [day]);
 
   useEffect(() => {
     const getGame = async (dayId: number) => {
@@ -83,7 +93,7 @@ export default function GameGuess() {
   }, []);
 
   useEffect(() => {
-    const currentProgress = loadProgressDay(dayId);
+    const currentProgress = loadProgressDayId(dayId);
     if (!currentProgress) saveProgress(dayId, [], [], false);
     setGuesses(currentProgress?.guesses ?? []);
     setLives(DEFAULT_LIVES - (currentProgress?.guesses.length ?? 0));
@@ -108,10 +118,15 @@ export default function GameGuess() {
           },
         ];
       });
-      setLives(lives - 1);
+      const currentLives = lives - 1;
+      setLives(currentLives);
 
       //store in local storage
       saveGuess(dayId, guessedGame);
+
+      if (currentLives <= 0) {
+        saveLost(dayId);
+      }
     }
   };
 
@@ -127,22 +142,19 @@ export default function GameGuess() {
 
   const giveUp = () => {
     setLives(0);
+    saveLost(dayId);
   };
 
   const goToPreviousDay = () => {
-    router.replace(`/game-guess/${dayId - 1}`);
+    router.push(`/game-guess/${dayId - 1}`);
   };
 
   const goToNextDay = () => {
-    router.replace(`/game-guess/${dayId + 1}`);
+    router.push(`/game-guess/${dayId + 1}`);
   };
 
-  const compareDate = (date1: Date, date2: Date) => {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
+  const goToList = () => {
+    router.push(`/game-guess/list`);
   };
 
   const isLocal = process.env.NODE_ENV !== "production";
@@ -158,13 +170,10 @@ export default function GameGuess() {
             <p>
               {day && day?.date.toDateString()} - #{dayId}
             </p>
-            <IconButton
-              onClick={goToNextDay}
-              disabled={compareDate(day?.date ?? new Date(), new Date())}
-            >
+            <IconButton onClick={goToNextDay} disabled={lastDayId === day?.id}>
               <ChevronRight></ChevronRight>
             </IconButton>
-            <IconButton>
+            <IconButton onClick={goToList}>
               <Calendar></Calendar>
             </IconButton>
           </div>
