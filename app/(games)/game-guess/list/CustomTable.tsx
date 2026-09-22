@@ -36,7 +36,11 @@ export default function CustomTable({ data, columns }: CustomTableProps) {
       </TableHeader>
       <TableBody>
         {data.map((row, rowIndex) => (
-          <TableRow key={rowIndex} onClick={() => goTo(row.id)}>
+          <TableRow
+            key={rowIndex}
+            onClick={() => goTo(row.id)}
+            className="cursor-pointer"
+          >
             {columns.map((column) => (
               <TableCell key={column.key}>{row[column.key]}</TableCell>
             ))}
