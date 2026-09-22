@@ -13,7 +13,7 @@ import {
   saveLost,
   saveProgress,
   saveWon,
-} from "@/lib/storage/progress";
+} from "@/lib/storage/game-guess/progress";
 import { GameSearchResult } from "@/app/lib/api/games";
 import ImgCarousel, { CarouselImg } from "@/components/ImgCarousel";
 import BlanksText from "@/components/BlanksText";
@@ -24,6 +24,7 @@ import Lives from "../_components/Lives";
 import Guesses from "../_components/Guesses";
 import { useRouter } from "next/navigation";
 import { Day, Game as GameType } from "@/lib/generated/prisma/client";
+import GamePaginator from "../../_components/GamePaginator";
 
 type GameProps = {
   dayId: number;
@@ -33,7 +34,6 @@ type GameProps = {
 };
 
 export default function Game({ dayId, day, game, lastDayId }: GameProps) {
-  const router = useRouter();
   const [lives, setLives] = useState(DEFAULT_LIVES);
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [hintsUsed, setHintsUsed] = useState<Set<string>>();
@@ -92,40 +92,12 @@ export default function Game({ dayId, day, game, lastDayId }: GameProps) {
     saveLost(dayId);
   };
 
-  const goToPreviousDay = () => {
-    router.push(`/game-guess/${dayId - 1}`);
-  };
-
-  const goToNextDay = () => {
-    router.push(`/game-guess/${dayId + 1}`);
-  };
-
-  const goToList = () => {
-    router.push(`/game-guess/list`);
-  };
-
   const isLocal = process.env.NODE_ENV !== "production";
 
   return (
     <>
       <Header pageTitle={"GAME GUESS"}>
-        <>
-          <div className="flex gap-2 items-center">
-            <IconButton onClick={goToPreviousDay} disabled={dayId === 1}>
-              <ChevronLeft></ChevronLeft>
-            </IconButton>
-            <p>
-              {day && day?.date.toDateString()} - #{dayId}
-            </p>
-            <IconButton onClick={goToNextDay} disabled={lastDayId === day?.id}>
-              <ChevronRight></ChevronRight>
-            </IconButton>
-            <IconButton onClick={goToList}>
-              <Calendar></Calendar>
-            </IconButton>
-          </div>
-          <p>Streak goes here</p>
-        </>
+        <GamePaginator day={day} lastDayId={lastDayId}></GamePaginator>
       </Header>
       <div className="flex gap-9">
         <div className="flex flex-col bg-[#262323] p-4 gap-3 w-2/3">

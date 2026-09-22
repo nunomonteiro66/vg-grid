@@ -1,14 +1,43 @@
+import { DEFAULT_GRID_LIVES } from "../constants";
 import { getItem, setItem } from "./wrapper";
 
-type Progress = {
-  [day: number]: Day;
-};
+class Base<T> {
+  dayId: number;
+  key: string;
+  progress: Record<number, T> = {};
+  progressDay: T;
+
+  constructor(dayId: number, key: string) {
+    this.dayId = dayId;
+    this.key = key;
+
+    this.progress = this.loadProgress();
+
+    this.progressDay = this.progress[dayId];
+  }
+
+  loadProgress() {
+    return getItem(this.key, this.progress);
+  }
+
+  saveProgress() {
+    setItem(this.key, this.progress);
+  }
+
+  addToProgress(newEntry: Record<number, T>) {
+    this.progress = {
+      ...this.progress,
+      ...newEntry,
+    };
+
+    this.saveProgress();
+  }
+}
 
 type Day = {
-  guesses: Game[];
-  hints: string[];
-  won: boolean;
+  lives: number;
   lost: boolean;
+  gridWon: boolean[];
 };
 
 type Game = {
@@ -16,68 +45,30 @@ type Game = {
   id: number;
 };
 
-const PROGRESS_KEY = "gameProgress";
+const PROGRESS_KEY = "gameGridProgress";
 
-const defaultProgress: Progress = {};
+export class GameGridStorageClass extends Base<Day> {
+  constructor(dayId: number) {
+    super(dayId, PROGRESS_KEY);
 
-export function loadProgress() {
-  return getItem(PROGRESS_KEY, defaultProgress);
-}
+    if (!this.progressDay) {
+      this.addToProgress({
+        [dayId]: {
+          lives: DEFAULT_GRID_LIVES,
+          lost: false,
+          gridWon: Array<boolean>(9).fill(false),
+        },
+      });
+    }
+  }
 
-export function loadProgressDayId(dayId: number): Day | undefined {
-  return loadProgress()[dayId];
-}
+  saveCurrentLives(lives: number) {
+    this.progressDay.lives = lives;
+    this.saveProgress();
+  }
 
-export function saveProgress(
-  day: number,
-  guesses: Game[],
-  hints: string[],
-  won = false,
-  lost = false,
-) {
-  const currentProgress = loadProgress();
-
-  const updated: Progress = {
-    ...currentProgress,
-    [day]: {
-      guesses: guesses,
-      hints: hints,
-      won: won,
-      lost: lost,
-    },
-  };
-
-  setItem(PROGRESS_KEY, updated);
-}
-
-export function saveGuess(day: number, guess: Game) {
-  const currentProgress = loadProgress();
-
-  currentProgress[day].guesses.push(guess);
-
-  setItem(PROGRESS_KEY, currentProgress);
-}
-
-export function saveHint(day: number, hint: string) {
-  const currentProgress = loadProgress();
-
-  currentProgress[day].hints.push(hint);
-
-  setItem(PROGRESS_KEY, currentProgress);
-}
-
-export function saveWon(day: number) {
-  const currentProgress = loadProgress();
-
-  currentProgress[day].won = true;
-
-  setItem(PROGRESS_KEY, currentProgress);
-}
-
-export function saveLost(day: number) {
-  const currentProgress = loadProgress();
-
-  currentProgress[day].lost = true;
-
-  setItem(PROGRESS_KEY, currentProgress);
+  saveWonSquare(gridWon: boolean[]) {
+    this.progressDay.gridWon = gridWon;
+    this.saveProgress();
+  }
 }

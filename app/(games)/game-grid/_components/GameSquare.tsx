@@ -10,9 +10,10 @@ import { Expand } from "lucide-react";
 import { Guess } from "../../game-guess/[dayId]/page";
 import { GameSearchResult } from "@/app/lib/api/games";
 import { RandomGame } from "@/lib/db/games";
+import { GameGrid } from "@/lib/db/gridSlot";
 
 type GameSquareProps = ComponentProps<"div"> & {
-  game?: RandomGame;
+  game?: GameGrid["game"];
   gameOver: boolean;
   setGameWon: () => void;
   reduceLife: () => void;

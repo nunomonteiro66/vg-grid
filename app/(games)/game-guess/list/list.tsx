@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import CustomTable from "./CustomTable";
 import { getAllDays } from "@/app/lib/api/day";
 import Header from "../../_components/Header";
-import { loadProgressDayId } from "@/lib/storage/progress";
+import { loadProgressDayId } from "@/lib/storage/game-guess/progress";
 import { getDateString } from "@/lib/helpers/date";
 import { Check, Cross, X } from "lucide-react";
 import { DEFAULT_LIVES } from "@/lib/constants";
