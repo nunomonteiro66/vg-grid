@@ -14,6 +14,7 @@ import { GameGrid } from "@/lib/db/gridSlot";
 
 type GameSquareProps = ComponentProps<"div"> & {
   game?: GameGrid["game"];
+  gameWon: boolean;
   gameOver: boolean;
   setGameWon: () => void;
   reduceLife: () => void;
@@ -41,19 +42,17 @@ function Dialog({ children }: DialogProps) {
 export default function GameSquare({
   game,
   gameOver,
+  gameWon,
   setGameWon,
   reduceLife,
   ...props
 }: GameSquareProps) {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [revealed, setRevealed] = useState(false);
-  const [won, setWon] = useState(true);
-  const hideAnswer = !revealed && !gameOver;
+  const hideAnswer = !gameWon && !gameOver;
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
   const checkGameSelect = (guessedGame: GameSearchResult) => {
     if (game?.id === guessedGame.id) {
-      setRevealed(true);
       setGameWon();
     } else {
       setGuesses((prev) => {
@@ -71,10 +70,12 @@ export default function GameSquare({
     }
   };
 
+  const isLocal = process.env.NODE_ENV !== "production";
+
   const Square = (
     <>
-      {game?.name}
       <div key={game?.id}>
+        {isLocal && <p>{game?.name}</p>}
         <ImgCarousel
           imgs={game?.screenshots ?? []}
           selectedIndex={selectedImage}

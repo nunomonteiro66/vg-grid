@@ -3,7 +3,7 @@
 import GameSquare from "../_components/GameSquare";
 import Lives from "../_components/Lives";
 import { Game } from "@/lib/igdb/helpers/types";
-import { Card } from "@radix-ui/themes";
+import { Button, Card } from "@radix-ui/themes";
 import { ComponentProps, useEffect, useRef, useState } from "react";
 import Header from "../../_components/Header";
 import { RandomGame } from "@/lib/db/games";
@@ -22,7 +22,7 @@ type GameGridProps = {
 };
 
 export default function GameGrid({ games, day, lastDayId }: GameGridProps) {
-  const [lives, setLives] = useState<number>(1);
+  const [lives, setLives] = useState<number>(DEFAULT_GRID_LIVES);
   const [messageOpen, setMessageOpen] = useState(false);
 
   const storageClassRef = useRef<GameGridStorageClass | null>(null);
@@ -44,8 +44,13 @@ export default function GameGrid({ games, day, lastDayId }: GameGridProps) {
 
   useEffect(() => {
     const currentProgress = storageClassRef.current?.progressDay;
-    if (currentProgress?.lives) setLives(currentProgress?.lives);
+
+    console.log("CURRENT DAY IS: ", currentProgress);
+
+    if (currentProgress?.lives !== undefined) setLives(currentProgress.lives);
     if (currentProgress?.gridWon) setAllGameStatus(currentProgress?.gridWon);
+
+    console.log(allGameStatus);
   }, [day.id]);
 
   const setGameWon = (index: number) => {
@@ -57,18 +62,39 @@ export default function GameGrid({ games, day, lastDayId }: GameGridProps) {
   };
 
   const reduceLife = () => {
-    setLives(lives - 1);
+    const newLives = lives - 1;
+    setLives(newLives);
     storageClassRef.current?.saveCurrentLives(lives - 1);
+
+    if (newLives === 0) {
+      const newArr = allGameStatus.map((status) =>
+        status === undefined ? false : status,
+      );
+
+      setAllGameStatus(newArr);
+
+      storageClassRef.current?.saveWonSquare(newArr);
+    }
   };
+
+  const isLocal = process.env.NODE_ENV !== "production";
 
   return (
     <>
       <Header pageTitle="GRID GAME">
-        <GamePaginator day={day} lastDayId={lastDayId}></GamePaginator>
-        <Lives lives={lives} />
+        <GamePaginator
+          day={day}
+          lastDayId={lastDayId}
+          className="w-1/3 justify-center"
+        ></GamePaginator>
+        <Lives lives={lives} className="w-1/3 justify-end" />
       </Header>
-      {allGameStatus.filter((f) => f === false).length === 0 ? "ALLL WON" : ""}
       <div className="flex flex-col gap-5">
+        {isLocal && (
+          <div>
+            <Button onClick={reduceLife}>REDUCE LIVE</Button>
+          </div>
+        )}
         {Array.from({ length: 3 }).map((_, row) => (
           <div
             className="grid grid-cols-3 gap-16"
@@ -78,21 +104,21 @@ export default function GameGrid({ games, day, lastDayId }: GameGridProps) {
             {Array.from({ length: 3 }).map((_, col) => {
               const index = row * 3 + col;
               const game = games?.at(index);
+              const gameWon = allGameStatus.at(index);
+
+              console.log("GAME STATUS: ", index, gameWon);
 
               return (
                 <Card
                   key={`game-${row * 3}-${col}`}
                   className={
-                    allGameStatus.at(index)
-                      ? "bg-green-600"
-                      : lives === 0
-                        ? "bg-red-600"
-                        : ""
+                    gameWon ? "bg-green-600" : lives === 0 ? "bg-red-600" : ""
                   }
                 >
                   <GameSquare
                     game={game["game"]}
                     gameOver={lives === 0}
+                    gameWon={gameWon ?? false}
                     setGameWon={() => setGameWon(index)}
                     reduceLife={reduceLife}
                   />

@@ -194,6 +194,8 @@ export async function getGridByDate(day: Date) {
 export type GameByDayId = Awaited<ReturnType<typeof getGameByDayId>>;
 
 export async function getGameByDayId(dayId: number) {
+  if (!Number.isInteger(dayId)) return null;
+
   const result = await prisma.day.findUnique({
     where: {
       id: dayId,

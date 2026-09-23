@@ -7,7 +7,7 @@ export type GameGrid = NonNullable<
 export async function getGridByDayId(dayId: number) {
   const dayIdNum = Number(dayId);
 
-  if (!dayIdNum) return;
+  if (!dayIdNum) return null;
 
   const games = await prisma.gridSlot.findMany({
     select: {

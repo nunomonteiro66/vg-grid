@@ -9,7 +9,7 @@ export default function Header({ pageTitle, children }: HeaderProps) {
   return (
     <header className="w-screen relative left-1/2 right-1/2 mx-[-50vw] mb-6 pb-2">
       <div className="flex justify-between items-center min-h-15 ml-6 mr-6">
-        <h1>{pageTitle}</h1>
+        <h1 className="grow">{pageTitle}</h1>
         {children}
       </div>
       <Separator.Root
