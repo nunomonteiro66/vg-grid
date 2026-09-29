@@ -5,7 +5,7 @@ import Lives from "../_components/Lives";
 import { Game } from "@/lib/igdb/helpers/types";
 import { Button, Card } from "@radix-ui/themes";
 import { ComponentProps, useEffect, useRef, useState } from "react";
-import Header from "../../_components/Header";
+import Header from "../../../../components/Header";
 import { RandomGame } from "@/lib/db/games";
 import { Dialog } from "radix-ui";
 import { CustomDialog } from "@/components/CustomDialog";

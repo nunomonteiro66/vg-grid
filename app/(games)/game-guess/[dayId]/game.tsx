@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, IconButton } from "@radix-ui/themes";
-import Header from "../../_components/Header";
+import Header from "../../../../components/Header";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DEFAULT_LIVES } from "@/lib/constants";

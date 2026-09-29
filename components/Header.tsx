@@ -1,4 +1,5 @@
 import { Separator } from "radix-ui";
+import AuthButton from "./AuthButton";
 
 type HeaderProps = {
   pageTitle: string;
@@ -11,6 +12,7 @@ export default function Header({ pageTitle, children }: HeaderProps) {
       <div className="flex justify-between items-center min-h-15 ml-6 mr-6">
         <h1 className="grow">{pageTitle}</h1>
         {children}
+        <AuthButton />
       </div>
       <Separator.Root
         className="mb-5 h-0.5 bg-gray-500"
