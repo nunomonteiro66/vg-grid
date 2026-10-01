@@ -11,9 +11,10 @@ import { DEFAULT_LIVES } from "@/lib/constants";
 import { AllDays } from "@/lib/db/day";
 
 type Data = {
+  id: number;
   day: string;
   game: string;
-  result: string;
+  result: React.ReactNode;
   guesses_used: string;
 };
 

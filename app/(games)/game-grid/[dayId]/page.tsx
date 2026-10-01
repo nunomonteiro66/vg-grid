@@ -15,6 +15,8 @@ export default async function GameGridGuess({ params }: GameGridGuess) {
   if (!games || games.length === 0) redirect(`/game-grid/${lastDay?.id ?? 1}`);
 
   const day = await getDayById(dayId);
+  if (!day) redirect(`/game-grid/${lastDay?.id ?? 1}`);
+
   return (
     <GameGrid games={games} day={day} lastDayId={lastDay?.id ?? 0}></GameGrid>
   );

@@ -36,7 +36,10 @@ export default async function LoginPage({
           <h2 className="text-4xl">Log in</h2>
         </FormTemplate.Header>
         <FormTemplate.Body>
-          <LoginForm></LoginForm>
+          <LoginForm
+            callbackUrl={safeCallbackUrl}
+            initialError={error}
+          ></LoginForm>
         </FormTemplate.Body>
       </FormTemplate.Root>
     </div>

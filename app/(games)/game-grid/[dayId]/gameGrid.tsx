@@ -116,7 +116,7 @@ export default function GameGrid({ games, day, lastDayId }: GameGridProps) {
                   }
                 >
                   <GameSquare
-                    game={game["game"]}
+                    game={game?.game}
                     gameOver={lives === 0}
                     gameWon={gameWon ?? false}
                     setGameWon={() => setGameWon(index)}

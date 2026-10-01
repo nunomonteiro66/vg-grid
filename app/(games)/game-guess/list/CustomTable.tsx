@@ -38,7 +38,7 @@ export default function CustomTable({ data, columns }: CustomTableProps) {
         {data.map((row, rowIndex) => (
           <TableRow
             key={rowIndex}
-            onClick={() => goTo(row.id)}
+            onClick={() => goTo(String(row.id))}
             className="cursor-pointer"
           >
             {columns.map((column) => (

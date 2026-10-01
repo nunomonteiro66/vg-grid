@@ -23,20 +23,21 @@ import Hints from "../_components/Hints";
 import Lives from "../_components/Lives";
 import Guesses from "../_components/Guesses";
 import { useRouter } from "next/navigation";
-import { Day, Game as GameType } from "@/lib/generated/prisma/client";
+import { Day } from "@/lib/generated/prisma/client";
+import { GameByDayId } from "@/lib/db/games";
 import GamePaginator from "../../_components/GamePaginator";
 
 type GameProps = {
   dayId: number;
   day: Day;
-  game: GameType;
+  game: NonNullable<GameByDayId>;
   lastDayId: number;
 };
 
 export default function Game({ dayId, day, game, lastDayId }: GameProps) {
   const [lives, setLives] = useState(DEFAULT_LIVES);
   const [guesses, setGuesses] = useState<Guess[]>([]);
-  const [hintsUsed, setHintsUsed] = useState<Set<string>>();
+  const [hintsUsed, setHintsUsed] = useState<Set<string>>(new Set());
   const [won, setWon] = useState(false);
 
   useEffect(() => {
@@ -135,7 +136,7 @@ export default function Game({ dayId, day, game, lastDayId }: GameProps) {
                 onGameSelect={onGameSelect}
                 guesses={guesses}
               />
-              <Button variant="destructive" onClick={giveUp}>
+              <Button color="red" onClick={giveUp}>
                 Give Up
               </Button>
             </div>

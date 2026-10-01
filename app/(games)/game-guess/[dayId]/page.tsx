@@ -23,6 +23,7 @@ export default async function GameGuess({ params }: GameGuessProps) {
   }
 
   const day = await getDayById(dayId);
+  if (!day) redirect(`/game-guess/${lastDay?.id ?? 1}`);
 
   return (
     <Game
